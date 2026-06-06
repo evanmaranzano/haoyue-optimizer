@@ -29,12 +29,20 @@ def risk_color(risk: str) -> str:
 
 
 def banner() -> str:
-    return f"""
-{CYAN}{BOLD}  ╔══════════════════════════════════════════════════╗
-  ║          皓月定制优化工具  v{VERSION:<10s}             ║
-  ║        Haoyue System Optimizer v2                 ║
-  ╚══════════════════════════════════════════════════╝{RESET}
-"""
+    title = f"皓月定制优化工具  v{VERSION}"
+    title_en = "Haoyue System Optimizer v2"
+    w = 50
+    title_cols = sum(2 if ord(c) > 0x7f else 1 for c in title)
+    l1 = (w - title_cols) // 2
+    r1 = w - title_cols - l1
+    l2 = (w - len(title_en)) // 2
+    r2 = w - len(title_en) - l2
+    return (
+        f"\n{CYAN}{BOLD}  ╔{'═' * w}╗\n"
+        f"  ║{' ' * l1}{title}{' ' * r1}║\n"
+        f"  ║{' ' * l2}{title_en}{' ' * r2}║\n"
+        f"  ╚{'═' * w}╝{RESET}\n"
+    )
 
 
 def print_banner() -> None:
