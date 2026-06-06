@@ -10,7 +10,7 @@ def get_optimizations() -> list[Optimization]:
             id="privacy_disable_compat_tasks",
             title="禁用兼容性与体验改善计划任务",
             category="privacy",
-            preset="privacy",
+            preset="aggressive",
             risk="yellow",
             evidence="high",
             benefit=["减少兼容性遥测和 CEIP 后台任务"],

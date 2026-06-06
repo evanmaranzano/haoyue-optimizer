@@ -10,7 +10,7 @@ def get_optimizations() -> list[Optimization]:
             id="disable_gpu_preempt",
             title="禁用 GPU 抢占调度",
             category="gpu",
-            preset="experimental",
+            preset="aggressive",
             risk="red",
             evidence="low",
             benefit=["减少 GPU 调度抢占，降低渲染延迟"],

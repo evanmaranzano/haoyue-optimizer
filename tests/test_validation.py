@@ -34,42 +34,40 @@ class PlanValidationTests(unittest.TestCase):
         }
 
     def test_valid_plan_returns_summary(self):
-        summary = validate_plan_for_apply(self.valid_plan(), allow_experimental=False)
+        summary = validate_plan_for_apply(self.valid_plan())
         self.assertEqual(summary["item_count"], 1)
         self.assertEqual(summary["action_count"], 1)
         self.assertEqual(summary["risk_counts"], {"green": 1})
         self.assertFalse(summary["requires_admin"])
-        self.assertFalse(summary["requires_reboot"])
+        self.assertEqual(summary["requires_reboot"], 0)
         self.assertEqual(summary["side_effects"], ["Xbox 录制不可用"])
-        self.assertFalse(summary["has_experimental"])
+        self.assertFalse(summary["has_high_risk"])
 
     def test_missing_action_id_is_rejected(self):
         plan = self.valid_plan()
         del plan["items"][0]["actions"][0]["action_id"]
         with self.assertRaises(PlanValidationError):
-            validate_plan_for_apply(plan, allow_experimental=False)
+            validate_plan_for_apply(plan)
 
     def test_unknown_action_type_is_rejected(self):
         plan = self.valid_plan()
         plan["items"][0]["actions"][0]["type"] = "dangerous_shell"
         with self.assertRaises(PlanValidationError):
-            validate_plan_for_apply(plan, allow_experimental=False)
+            validate_plan_for_apply(plan)
 
-    def test_experimental_is_rejected_by_default(self):
+    def test_high_risk_plan_passes_validation(self):
         plan = self.valid_plan()
-        plan["preset"] = "experimental"
-        plan["items"][0]["preset"] = "experimental"
+        plan["preset"] = "aggressive"
+        plan["items"][0]["preset"] = "aggressive"
         plan["items"][0]["risk"] = "red"
-        with self.assertRaises(PlanValidationError):
-            validate_plan_for_apply(plan, allow_experimental=False)
+        summary = validate_plan_for_apply(plan)
+        self.assertTrue(summary["has_high_risk"])
 
-    def test_experimental_can_be_allowed_explicitly(self):
+    def test_yellow_risk_counts_as_high_risk(self):
         plan = self.valid_plan()
-        plan["preset"] = "experimental"
-        plan["items"][0]["preset"] = "experimental"
-        plan["items"][0]["risk"] = "red"
-        summary = validate_plan_for_apply(plan, allow_experimental=True)
-        self.assertTrue(summary["has_experimental"])
+        plan["items"][0]["risk"] = "yellow"
+        summary = validate_plan_for_apply(plan)
+        self.assertTrue(summary["has_high_risk"])
 
 
 if __name__ == "__main__":

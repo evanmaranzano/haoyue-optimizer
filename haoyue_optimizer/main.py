@@ -44,7 +44,6 @@ def main(argv: list[str] | None = None) -> int:
     apply_parser.add_argument("--plan", required=True)
     apply_parser.add_argument("--report", action="store_true")
     apply_parser.add_argument("--yes", action="store_true", help="跳过交互确认")
-    apply_parser.add_argument("--allow-experimental", action="store_true", help="允许应用 experimental 计划")
 
     rollback_parser = sub.add_parser("rollback", help="按备份回滚")
     rollback_parser.add_argument("target", nargs="?", default="latest")
@@ -80,7 +79,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "apply":
         plan = json.loads(Path(args.plan).read_text(encoding="utf-8"))
         try:
-            summary = validate_plan_for_apply(plan, allow_experimental=args.allow_experimental)
+            summary = validate_plan_for_apply(plan)
         except PlanValidationError as exc:
             print(f"计划校验失败: {exc}", file=sys.stderr)
             return 2

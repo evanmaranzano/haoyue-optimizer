@@ -14,7 +14,7 @@ from haoyue_optimizer.core.report import export_report
 from haoyue_optimizer.core.validation import PlanValidationError, validate_plan_for_apply
 from haoyue_optimizer.ui.format import BOLD, CYAN, DIM, GREEN, RED, RESET, YELLOW, banner, clear_screen, pause, risk_label, section
 from haoyue_optimizer.ui.scan import summarize_plan_status
-from haoyue_optimizer.ui.selection import ask_preset, newest_plan_files, parse_selection
+from haoyue_optimizer.ui.selection import ask_preset, parse_selection
 
 
 def run_interactive() -> int:
@@ -36,18 +36,18 @@ def run_interactive() -> int:
         elif choice == "2":
             apply_preset("safe")
         elif choice == "3":
-            custom_select()
+            apply_preset("aggressive")
         elif choice == "4":
-            generate_plan()
+            custom_select()
         elif choice == "5":
-            show_items()
+            generate_plan()
         elif choice == "6":
-            rollback_menu()
+            show_items()
         elif choice == "7":
+            rollback_menu()
+        elif choice == "8":
             print(section("系统体检"))
             print_doctor()
-        elif choice == "8":
-            show_presets()
         else:
             print(f"  {DIM}无效选项{RESET}")
         pause()
@@ -56,13 +56,13 @@ def run_interactive() -> int:
 def print_main_menu() -> None:
     print(section("主菜单 [管理员]"))
     print(f"    {GREEN}1{RESET}  扫描系统 + 智能补充缺失项")
-    print(f"    {GREEN}2{RESET}  一键应用 safe 方案")
-    print(f"    {YELLOW}3{RESET}  自定义选择优化项")
-    print(f"    {CYAN}4{RESET}  生成 / 查看 JSON 计划")
-    print(f"    {CYAN}5{RESET}  查看全部优化项")
-    print(f"    {RED}6{RESET}  恢复备份")
-    print(f"    {DIM}7{RESET}  系统体检 doctor")
-    print(f"    {DIM}8{RESET}  预设说明")
+    print(f"    {GREEN}2{RESET}  一键应用 safe（安全）方案")
+    print(f"    {YELLOW}3{RESET}  一键应用 aggressive（激进）方案")
+    print(f"    {CYAN}4{RESET}  自定义选择优化项")
+    print(f"    {CYAN}5{RESET}  生成 / 查看 JSON 计划")
+    print(f"    {CYAN}6{RESET}  查看全部优化项")
+    print(f"    {RED}7{RESET}  恢复备份")
+    print(f"    {DIM}8{RESET}  系统体检 doctor")
     print(f"    {DIM}0{RESET}  退出")
     print()
 
@@ -102,15 +102,12 @@ def scan_and_supplement() -> None:
     if not summary["missing"]:
         print(f"\n  {GREEN}没有缺失项。{RESET}")
         return
-    if preset == "experimental":
-        print(f"\n  {RED}experimental 不能通过智能补充直接应用，请生成计划后走高风险流程。{RESET}")
-        return
     confirm = input(f"\n  是否补充缺失项？[{GREEN}y{RESET}/{DIM}N{RESET}]: ").strip().lower()
     if confirm != "y":
         print(f"  {YELLOW}已取消{RESET}")
         return
     missing_plan = {**plan, "items": summary["missing"]}
-    execute_plan(missing_plan, allow_experimental=False)
+    execute_plan(missing_plan)
 
 
 def apply_preset(preset: str) -> None:
@@ -122,7 +119,7 @@ def apply_preset(preset: str) -> None:
     if not plan["items"]:
         print(f"\n  {GREEN}该预设无优化项。{RESET}")
         return
-    execute_plan(plan, allow_experimental=False)
+    execute_plan(plan)
 
 
 def custom_select() -> None:
@@ -130,9 +127,6 @@ def custom_select() -> None:
     print(banner())
     preset = ask_preset()
     if not preset:
-        return
-    if preset == "experimental":
-        print(f"\n  {RED}experimental 需要走高风险计划流程，不能在普通自定义选择中直接应用。{RESET}")
         return
     plan = build_plan(preset)
     print(section(f"自定义选择: {preset}"))
@@ -144,7 +138,7 @@ def custom_select() -> None:
         return
     selected_items = [plan["items"][i] for i in indices]
     selected_plan = {**plan, "items": selected_items}
-    execute_plan(selected_plan, allow_experimental=False)
+    execute_plan(selected_plan)
 
 
 def generate_plan() -> None:
@@ -200,12 +194,6 @@ def rollback_menu() -> None:
     print(f"\n  {GREEN}已回滚: {path.name}{RESET}")
 
 
-def show_presets() -> None:
-    print(section("预设说明"))
-    for name, desc in PRESETS.items():
-        print(f"    {CYAN}{name:14s}{RESET}  {desc}")
-
-
 def print_doctor() -> None:
     for preset in PRESETS:
         plan = build_plan(preset)
@@ -214,28 +202,66 @@ def print_doctor() -> None:
         print(f"    {CYAN}{preset:14s}{RESET}  {item_count} 项 / {action_count} 动作")
 
 
-def execute_plan(plan: dict, allow_experimental: bool) -> None:
+def execute_plan(plan: dict) -> None:
     try:
-        summary = validate_plan_for_apply(plan, allow_experimental=allow_experimental)
+        summary = validate_plan_for_apply(plan)
     except PlanValidationError as exc:
         print(f"\n  {RED}计划校验失败: {exc}{RESET}")
         return
-    print(format_apply_summary(summary))
-    if summary["has_experimental"]:
-        token = input(f"\n  输入 {RED}EXPERIMENTAL{RESET} 确认进入高风险执行: ").strip()
-        if token != "EXPERIMENTAL":
+
+    print_risk_summary(plan, summary)
+
+    if summary["has_high_risk"]:
+        token = input(f"\n  包含 {YELLOW}yellow{RESET} 或 {RED}red{RESET} 风险项，输入 {RED}AGGRESSIVE{RESET} 确认: ").strip()
+        if token != "AGGRESSIVE":
             print(f"  {YELLOW}已取消{RESET}")
             return
+
     confirm = input(f"\n  输入 {RED}APPLY{RESET} 确认执行: ").strip()
     if confirm != "APPLY":
         print(f"  {YELLOW}已取消{RESET}")
         return
+
     print(f"\n  {BOLD}执行中...{RESET}")
     start = time.time()
     backup = apply_plan(plan)
     elapsed = time.time() - start
     report_path = export_report(plan, backup)
     print_execution_result(backup, report_path, elapsed)
+
+
+def print_risk_summary(plan: dict, summary: dict) -> None:
+    print(section("即将应用计划"))
+    print(f"    优化项: {summary['item_count']}")
+    print(f"    动作数: {summary['action_count']}")
+
+    risk_counts = summary.get("risk_counts", {})
+    parts = []
+    for r, color in [("green", GREEN), ("yellow", YELLOW), ("red", RED)]:
+        if r in risk_counts:
+            parts.append(f"{color}{r}={risk_counts[r]}{RESET}")
+    if parts:
+        print(f"    风险分布: {' / '.join(parts)}")
+
+    if summary["requires_reboot"]:
+        print(f"    {YELLOW}需要重启的项: {summary['requires_reboot']}{RESET}")
+
+    high_risk_items = [item for item in plan["items"] if item["risk"] in ("red", "yellow")]
+    if high_risk_items:
+        print(f"\n  {YELLOW}以下项需特别注意:{RESET}")
+        for item in high_risk_items:
+            rc = RED if item["risk"] == "red" else YELLOW
+            print(f"    {rc}[{item['risk']}]{RESET}  {item['title']}")
+            for eff in item.get("side_effects", [])[:2]:
+                print(f"      {DIM}副作用: {eff}{RESET}")
+
+    safe_items = [item for item in plan["items"] if item["risk"] == "green"]
+    if safe_items:
+        print(f"\n  {GREEN}安全项 ({len(safe_items)}):{RESET}")
+        for item in safe_items[:10]:
+            print(f"    {GREEN}✓{RESET} {item['title']}")
+        if len(safe_items) > 10:
+            print(f"    {DIM}... 等 {len(safe_items)} 项{RESET}")
 
 
 def format_apply_summary(summary: dict) -> str:
@@ -278,7 +304,7 @@ def print_execution_result(backup: dict, report_path: Path, elapsed: float) -> N
     print(f"\n    {DIM}报告: {report_path}{RESET}")
     print(f"    {DIM}备份: {backup.get('backup_path', '内存')}{RESET}")
     if fail:
-        print(f"\n    {YELLOW}部分项失败，可使用菜单 6 回滚{RESET}")
+        print(f"\n    {YELLOW}部分项失败，可使用菜单 7 回滚{RESET}")
 
 
 def plan_output_path(preset: str) -> Path:

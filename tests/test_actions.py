@@ -138,7 +138,7 @@ class CatalogPlanTests(unittest.TestCase):
         for item in optimizations:
             self.assertTrue(item.side_effects, item.id)
             self.assertIn(item.risk, {"green", "yellow", "red"})
-            self.assertIn(item.preset, {"safe", "gaming", "privacy", "experimental"})
+            self.assertIn(item.preset, {"safe", "aggressive"})
 
     def test_plan_includes_legacy_ids_and_applicability(self):
         plan = build_plan("safe", registry_backend=FakeRegistryBackend(), service_backend=FakeServiceBackend())
@@ -168,11 +168,10 @@ class CatalogPlanTests(unittest.TestCase):
         services.add_service("MMCMS", start_type="auto", running=True)
         power.set_value("scheme-a", "2a737441-1930-4402-8d77-b2bebba308a3", "48e6b7a6-50f5-4782-a5d4-53bb8f07e226", ac=1, dc=1)
 
-        for preset in ("safe", "gaming", "privacy", "experimental"):
+        for preset in ("safe", "aggressive"):
             plan = build_plan(preset, registry_backend=registry, service_backend=services, task_backend=tasks, power_backend=power)
             self.assertEqual(plan["preset"], preset)
-            if preset != "experimental":
-                self.assertTrue(plan["items"], preset)
+            self.assertTrue(plan["items"], preset)
             for item in plan["items"]:
                 for action in item["actions"]:
                     self.assertIn("action_id", action)
@@ -199,9 +198,8 @@ class ExecutorTests(unittest.TestCase):
         power.set_value("scheme-a", "2a737441-1930-4402-8d77-b2bebba308a3", "48e6b7a6-50f5-4782-a5d4-53bb8f07e226", ac=1, dc=1)
 
         safe_plan = build_plan("safe", registry_backend=registry, service_backend=services, task_backend=tasks, power_backend=power)
-        gaming_plan = build_plan("gaming", registry_backend=registry, service_backend=services, task_backend=tasks, power_backend=power)
-        privacy_plan = build_plan("privacy", registry_backend=registry, service_backend=services, task_backend=tasks, power_backend=power)
-        combined = {**safe_plan, "preset": "combined", "items": safe_plan["items"] + gaming_plan["items"] + privacy_plan["items"]}
+        aggressive_plan = build_plan("aggressive", registry_backend=registry, service_backend=services, task_backend=tasks, power_backend=power)
+        combined = {**safe_plan, "preset": "combined", "items": safe_plan["items"] + aggressive_plan["items"]}
 
         backup = apply_plan(combined, registry_backend=registry, service_backend=services, task_backend=tasks, power_backend=power, write_file=False)
 
@@ -246,7 +244,7 @@ class CatalogLegacyIdTests(unittest.TestCase):
 
 class CliSmokeTests(unittest.TestCase):
     def test_cli_plan_outputs_json_for_all_presets(self):
-        for preset in ("safe", "gaming", "privacy", "experimental"):
+        for preset in ("safe", "aggressive"):
             result = subprocess.run(
                 [sys.executable, "-m", "haoyue_optimizer.main", "plan", "--preset", preset],
                 capture_output=True,
@@ -258,8 +256,7 @@ class CliSmokeTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             payload = json.loads(result.stdout)
             self.assertEqual(payload["preset"], preset)
-            if preset != "experimental":
-                self.assertTrue(payload["items"])
+            self.assertTrue(payload["items"])
 
     def test_cli_presets_and_doctor_are_read_only(self):
         for command in (["presets"], ["doctor"]):

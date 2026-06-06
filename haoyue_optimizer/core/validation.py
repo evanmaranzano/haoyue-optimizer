@@ -18,7 +18,7 @@ class PlanValidationError(ValueError):
     pass
 
 
-def validate_plan_for_apply(plan: dict[str, Any], allow_experimental: bool) -> dict[str, Any]:
+def validate_plan_for_apply(plan: dict[str, Any], **_kwargs) -> dict[str, Any]:
     if plan.get("version") != "2.0.0":
         raise PlanValidationError("unsupported or missing plan version")
     items = plan.get("items")
@@ -28,9 +28,9 @@ def validate_plan_for_apply(plan: dict[str, Any], allow_experimental: bool) -> d
     action_count = 0
     risk_counts: dict[str, int] = {}
     requires_admin = False
-    requires_reboot = False
+    requires_reboot = 0
     side_effects: list[str] = []
-    has_experimental = plan.get("preset") == "experimental"
+    has_high_risk = False
 
     for index, item in enumerate(items):
         if not isinstance(item, dict):
@@ -38,11 +38,12 @@ def validate_plan_for_apply(plan: dict[str, Any], allow_experimental: bool) -> d
         for key in ("id", "preset", "risk", "actions"):
             if key not in item:
                 raise PlanValidationError(f"item {index} missing {key}")
-        if item["preset"] == "experimental" or item["risk"] == "red":
-            has_experimental = True
+        if item["risk"] in ("red", "yellow"):
+            has_high_risk = True
         risk_counts[item["risk"]] = risk_counts.get(item["risk"], 0) + 1
         requires_admin = requires_admin or bool(item.get("requires_admin", True))
-        requires_reboot = requires_reboot or bool(item.get("requires_reboot", False))
+        if item.get("requires_reboot"):
+            requires_reboot += 1
         for effect in item.get("side_effects", []):
             if isinstance(effect, str):
                 side_effects.append(effect)
@@ -60,9 +61,6 @@ def validate_plan_for_apply(plan: dict[str, Any], allow_experimental: bool) -> d
                 raise PlanValidationError(f"unsupported action type: {action['type']}")
             action_count += 1
 
-    if has_experimental and not allow_experimental:
-        raise PlanValidationError("experimental plan requires --allow-experimental")
-
     return {
         "item_count": len(items),
         "action_count": action_count,
@@ -70,5 +68,5 @@ def validate_plan_for_apply(plan: dict[str, Any], allow_experimental: bool) -> d
         "requires_admin": requires_admin,
         "requires_reboot": requires_reboot,
         "side_effects": side_effects,
-        "has_experimental": has_experimental,
+        "has_high_risk": has_high_risk,
     }

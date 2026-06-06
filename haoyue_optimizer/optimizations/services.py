@@ -31,7 +31,7 @@ def get_optimizations() -> list[Optimization]:
             id="disable_mmcss",
             title="禁用多媒体类调度服务",
             category="services",
-            preset="experimental",
+            preset="aggressive",
             risk="red",
             evidence="low",
             benefit=["关闭 MMCSS 减少系统对多媒体线程的调度干预"],
