@@ -1,0 +1,112 @@
+from __future__ import annotations
+
+from haoyue_optimizer.core.models import Optimization
+from haoyue_optimizer.core.registry import RegistrySetAction
+
+
+def get_optimizations() -> list[Optimization]:
+    return [
+        Optimization(
+            id="disable_gamedvr",
+            title="禁用 Game DVR / Xbox 录制",
+            category="gaming",
+            preset="safe",
+            risk="green",
+            evidence="medium",
+            benefit=["减少后台录制和叠加层干扰"],
+            side_effects=["Xbox 录制、截图、回放功能不可用"],
+            legacy_ids=["gamedvr", "gamedvr_policy"],
+            actions=[
+                RegistrySetAction("HKCU", r"System\GameConfigStore", "GameDVR_Enabled", 0, "dword"),
+                RegistrySetAction("HKCU", r"SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR", "AppCaptureEnabled", 0, "dword"),
+                RegistrySetAction("HKLM", r"SOFTWARE\Policies\Microsoft\Windows\GameDVR", "AllowGameDVR", 0, "dword"),
+            ],
+        ),
+        Optimization(
+            id="enable_gamemode",
+            title="启用 Windows Game Mode",
+            category="gaming",
+            preset="safe",
+            risk="green",
+            evidence="medium",
+            benefit=["让 Windows 在游戏时优先分配资源"],
+            side_effects=["极少数旧游戏可能表现无变化或需要关闭 Game Mode 对比"],
+            legacy_ids=["gamemode"],
+            actions=[
+                RegistrySetAction("HKCU", r"SOFTWARE\Microsoft\GameBar", "AllowAutoGameMode", 1, "dword"),
+                RegistrySetAction("HKCU", r"SOFTWARE\Microsoft\GameBar", "AutoGameModeEnabled", 1, "dword"),
+            ],
+        ),
+        Optimization(
+            id="force_fse",
+            title="优化全屏独占模式行为",
+            category="gaming",
+            preset="gaming",
+            risk="green",
+            evidence="medium",
+            benefit=["优化全屏独占模式(FSE)行为，减少输入延迟"],
+            side_effects=["全屏独占模式行为改变，部分旧游戏可能受影响"],
+            legacy_ids=["fse"],
+            actions=[
+                RegistrySetAction("HKCU", r"System\GameConfigStore", "GameDVR_FSEBehaviorMode", 2, "dword"),
+                RegistrySetAction("HKCU", r"System\GameConfigStore", "GameDVR_HonorUserFSEBehaviorMode", 1, "dword"),
+                RegistrySetAction("HKCU", r"System\GameConfigStore", "GameDVR_FSEBehavior", 2, "dword"),
+                RegistrySetAction("HKCU", r"System\GameConfigStore", "GameDVR_DXGIHonorFSEWindowsCompatible", 1, "dword", qualifier="fse"),
+                RegistrySetAction("HKCU", r"System\GameConfigStore", "HonorUserFSEBehaviorMode", 1, "dword"),
+                RegistrySetAction("HKCU", r"System\GameConfigStore", "FSEBehavior", 2, "dword"),
+                RegistrySetAction("HKCU", r"System\GameConfigStore", "DXGIFHonorFSEWindowsCompatible", 1, "dword"),
+            ],
+            requires_admin=False,
+        ),
+        Optimization(
+            id="enable_hags",
+            title="启用硬件加速 GPU 调度",
+            category="gaming",
+            preset="gaming",
+            risk="yellow",
+            evidence="medium",
+            benefit=["启用硬件加速 GPU 调度以减少延迟"],
+            side_effects=["需要 GPU 和驱动支持硬件加速调度，不支持时无效果"],
+            legacy_ids=["hags"],
+            actions=[
+                RegistrySetAction("HKLM", r"SYSTEM\CurrentControlSet\Control\GraphicsDrivers", "HwSchMode", 2, "dword"),
+            ],
+            requires_admin=True,
+        ),
+        Optimization(
+            id="disable_vrr",
+            title="禁用可变刷新率优化",
+            category="gaming",
+            preset="gaming",
+            risk="yellow",
+            evidence="medium",
+            benefit=["禁用可变刷新率优化以减少帧同步开销"],
+            side_effects=["可变刷新率优化关闭，可能影响显示器撕裂表现"],
+            legacy_ids=["vrr"],
+            actions=[
+                RegistrySetAction("HKCU", r"SOFTWARE\Microsoft\DirectX\UserGpuPreferences", "DirectXUserGlobalSettings", "VRROptimizeEnable=0;", "sz"),
+            ],
+            requires_admin=False,
+        ),
+        Optimization(
+            id="gaming_mmcss_games",
+            title="优化 MMCMS 游戏任务调度",
+            category="gaming",
+            preset="gaming",
+            risk="yellow",
+            evidence="medium",
+            benefit=["提升游戏任务在多媒体调度器中的优先级"],
+            side_effects=["改变多媒体调度器对游戏任务的优先级分配"],
+            legacy_ids=["mmcss_games"],
+            actions=[
+                RegistrySetAction("HKLM", r"SOFTWARE\Microsoft\Windows\CurrentVersion\Multimedia\SystemProfile\Tasks\Games", "Affinity", 0, "dword"),
+                RegistrySetAction("HKLM", r"SOFTWARE\Microsoft\Windows\CurrentVersion\Multimedia\SystemProfile\Tasks\Games", "Background Only", "False", "sz"),
+                RegistrySetAction("HKLM", r"SOFTWARE\Microsoft\Windows\CurrentVersion\Multimedia\SystemProfile\Tasks\Games", "Clock Rate", 10000, "dword"),
+                RegistrySetAction("HKLM", r"SOFTWARE\Microsoft\Windows\CurrentVersion\Multimedia\SystemProfile\Tasks\Games", "GPU Priority", 8, "dword"),
+                RegistrySetAction("HKLM", r"SOFTWARE\Microsoft\Windows\CurrentVersion\Multimedia\SystemProfile\Tasks\Games", "Priority", 6, "dword"),
+                RegistrySetAction("HKLM", r"SOFTWARE\Microsoft\Windows\CurrentVersion\Multimedia\SystemProfile\Tasks\Games", "Scheduling Category", "High", "sz"),
+                RegistrySetAction("HKLM", r"SOFTWARE\Microsoft\Windows\CurrentVersion\Multimedia\SystemProfile\Tasks\Games", "SFIO Priority", "High", "sz"),
+            ],
+            requires_admin=True,
+        ),
+    ]

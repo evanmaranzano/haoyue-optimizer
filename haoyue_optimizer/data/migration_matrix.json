@@ -1,0 +1,1832 @@
+{
+  "version": "1.0",
+  "source": "C:/Users/Administrator/Desktop/皓月定制优化工具.py",
+  "legacy_count": 73,
+  "items": [
+    {
+      "legacy_id": "gamedvr",
+      "legacy_name": "禁用 Game DVR / Xbox 录制",
+      "legacy_category": "游戏",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_disable_gamedvr",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "disable_gamedvr",
+      "new_preset": "gaming",
+      "new_risk": "green",
+      "requires_admin": false,
+      "requires_reboot": false,
+      "side_effects": [
+        "Xbox 录制、回放和截图功能不可用。"
+      ],
+      "verify": "读取相关注册表值并与 desired 比较。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版低风险游戏录制项，副作用明确，可检测、可回滚，适合迁移。"
+    },
+    {
+      "legacy_id": "gamedvr_policy",
+      "legacy_name": "组策略层禁用 Game DVR",
+      "legacy_category": "游戏",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_disable_gamedvr_policy",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "merged",
+      "new_id": "disable_gamedvr",
+      "new_preset": "gaming",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "策略层禁用后，Game DVR 相关功能会被更强制地关闭。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目与其他项目标一致，适合合并到单个新版优化项统一审计。"
+    },
+    {
+      "legacy_id": "fse",
+      "legacy_name": "强制全屏独占模式 (FSE)",
+      "legacy_category": "游戏",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_force_fse",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "migrated",
+      "new_id": "force_fse",
+      "new_preset": "gaming",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": true,
+      "side_effects": [
+        "执行旧版函数 opt_force_fse 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目边界清晰，副作用可描述，可作为新版独立优化项落位。"
+    },
+    {
+      "legacy_id": "gamemode",
+      "legacy_name": "启用 Windows Game Mode",
+      "legacy_category": "游戏",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_enable_gamemode",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "enable_gamemode",
+      "new_preset": "gaming",
+      "new_risk": "green",
+      "requires_admin": false,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_enable_gamemode 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "hags",
+      "legacy_name": "启用硬件加速 GPU 调度 (HAGS)",
+      "legacy_category": "游戏",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_enable_hags",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "migrated",
+      "new_id": "enable_hags",
+      "new_preset": "gaming",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": true,
+      "side_effects": [
+        "执行旧版函数 opt_enable_hags 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目边界清晰，副作用可描述，可作为新版独立优化项落位。"
+    },
+    {
+      "legacy_id": "vrr",
+      "legacy_name": "禁用可变刷新率 (VRR)",
+      "legacy_category": "游戏",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_disable_vrr",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "migrated",
+      "new_id": "disable_vrr",
+      "new_preset": "gaming",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_disable_vrr 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目边界清晰，副作用可描述，可作为新版独立优化项落位。"
+    },
+    {
+      "legacy_id": "mmcss_games",
+      "legacy_name": "MMCSS 游戏调度高优先级",
+      "legacy_category": "游戏",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_mmcss_games",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "migrated",
+      "new_id": "gaming_mmcss_games",
+      "new_preset": "gaming",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_mmcss_games 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目边界清晰，副作用可描述，可作为新版独立优化项落位。"
+    },
+    {
+      "legacy_id": "net_throttle",
+      "legacy_name": "禁用网络节流 + 系统响应最大化",
+      "legacy_category": "网络",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_network_throttle",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_net_throttle",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_network_throttle 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "tcp_nodelay",
+      "legacy_name": "TCP 无延迟 (关闭 Nagle)",
+      "legacy_category": "网络",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_tcp_nodelay",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_tcp_nodelay",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_tcp_nodelay 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "dns_priority",
+      "legacy_name": "主机解析优先级调整",
+      "legacy_category": "网络",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_dns_priority",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_dns_priority",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_dns_priority 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "dns_negative",
+      "legacy_name": "DNS 负面缓存禁用",
+      "legacy_category": "网络",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_dns_negative_cache",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_dns_negative",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_dns_negative_cache 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "qos_bw",
+      "legacy_name": "取消 QoS 保留带宽",
+      "legacy_category": "网络",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_qos_bandwidth",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_qos_bw",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_qos_bandwidth 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "qos_nla",
+      "legacy_name": "QoS 不依赖网络位置感知",
+      "legacy_category": "网络",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_qos_nla",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_qos_nla",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_qos_nla 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "net_mem",
+      "legacy_name": "网络内存分配优化",
+      "legacy_category": "网络",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_network_memory_alloc",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_net_mem",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_network_memory_alloc 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "kb_opt",
+      "legacy_name": "键盘响应优化",
+      "legacy_category": "键鼠",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_keyboard",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "disable_kb_opt",
+      "new_preset": "safe",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_keyboard 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "mouse_opt",
+      "legacy_name": "鼠标响应优化 (禁用加速)",
+      "legacy_category": "键鼠",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_mouse",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "disable_mouse_opt",
+      "new_preset": "safe",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_mouse 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "sticky_keys",
+      "legacy_name": "禁用粘滞键",
+      "legacy_category": "键鼠",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_disable_sticky_keys",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "disable_sticky_keys",
+      "new_preset": "safe",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "对应辅助功能热键或提示音会被关闭。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "toggle_keys",
+      "legacy_name": "禁用切换键提示音",
+      "legacy_category": "键鼠",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_disable_toggle_keys",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "disable_toggle_keys",
+      "new_preset": "safe",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "对应辅助功能热键或提示音会被关闭。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "access_all",
+      "legacy_name": "全面禁用辅助功能热键",
+      "legacy_category": "键鼠",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_disable_accessibility_all",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "disable_access_all",
+      "new_preset": "safe",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "对应辅助功能热键或提示音会被关闭。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "ssd_opt",
+      "legacy_name": "SSD 磁盘优化 (fsutil)",
+      "legacy_category": "磁盘",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_ssd",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "disable_ssd_opt",
+      "new_preset": "safe",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_ssd 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "bg_apps",
+      "legacy_name": "禁用后台应用",
+      "legacy_category": "系统",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_disable_background_apps",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "disable_background_apps",
+      "new_preset": "privacy",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_disable_background_apps 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "transparency",
+      "legacy_name": "禁用窗口透明效果",
+      "legacy_category": "系统",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_disable_transparency",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "disable_transparency",
+      "new_preset": "safe",
+      "new_risk": "green",
+      "requires_admin": false,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_disable_transparency 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "setting_sync",
+      "legacy_name": "禁用设置同步",
+      "legacy_category": "系统",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_disable_setting_sync",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "disable_setting_sync",
+      "new_preset": "privacy",
+      "new_risk": "green",
+      "requires_admin": false,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_disable_setting_sync 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "content_del",
+      "legacy_name": "禁用开始菜单广告/建议",
+      "legacy_category": "系统",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_disable_content_delivery",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "disable_content_delivery",
+      "new_preset": "privacy",
+      "new_risk": "green",
+      "requires_admin": false,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_disable_content_delivery 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "tracking",
+      "legacy_name": "禁用使用习惯跟踪",
+      "legacy_category": "系统",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_disable_tracking",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "merged",
+      "new_id": "disable_basic_telemetry",
+      "new_preset": "privacy",
+      "new_risk": "green",
+      "requires_admin": false,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_disable_tracking 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目与其他项目标一致，适合合并到单个新版优化项统一审计。"
+    },
+    {
+      "legacy_id": "driver_search",
+      "legacy_name": "禁用自动驱动搜索",
+      "legacy_category": "系统",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_disable_driver_search",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "disable_driver_search",
+      "new_preset": "privacy",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_disable_driver_search 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "telemetry",
+      "legacy_name": "关闭遥测 / 广告 / 建议",
+      "legacy_category": "系统",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_disable_telemetry",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "disable_basic_telemetry",
+      "new_preset": "privacy",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_disable_telemetry 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "svchost_thresh",
+      "legacy_name": "SvcHost 内存拆分阈值",
+      "legacy_category": "系统",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_svchost_threshold",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "disable_svchost_thresh",
+      "new_preset": "safe",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_svchost_threshold 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "file_alloc",
+      "legacy_name": "文件系统分配优化",
+      "legacy_category": "系统",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_file_alloc",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "disable_file_alloc",
+      "new_preset": "safe",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_file_alloc 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "admin_share",
+      "legacy_name": "禁用默认管理共享",
+      "legacy_category": "系统",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_disable_admin_shares",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "disable_admin_share",
+      "new_preset": "safe",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_disable_admin_shares 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "autorun",
+      "legacy_name": "禁用自动运行",
+      "legacy_category": "系统",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_disable_autorun",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "disable_autorun",
+      "new_preset": "safe",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_disable_autorun 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "explorer_restart",
+      "legacy_name": "Explorer 崩溃自动重启",
+      "legacy_category": "系统",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_explorer_restart",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "disable_explorer_restart",
+      "new_preset": "safe",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_explorer_restart 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "map_download",
+      "legacy_name": "禁用地图数据下载",
+      "legacy_category": "系统",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_disable_map_download",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "disable_map_download",
+      "new_preset": "safe",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_disable_map_download 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "feeds",
+      "legacy_name": "隐藏任务栏新闻和兴趣",
+      "legacy_category": "系统",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_hide_feeds",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "merged",
+      "new_id": "disable_content_delivery",
+      "new_preset": "privacy",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_hide_feeds 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目与其他项目标一致，适合合并到单个新版优化项统一审计。"
+    },
+    {
+      "legacy_id": "soft_landing",
+      "legacy_name": "关闭 Windows 技巧和建议",
+      "legacy_category": "系统",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_disable_soft_landing",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "merged",
+      "new_id": "disable_content_delivery",
+      "new_preset": "privacy",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_disable_soft_landing 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目与其他项目标一致，适合合并到单个新版优化项统一审计。"
+    },
+    {
+      "legacy_id": "wu_pause",
+      "legacy_name": "Windows Update 暂停上限 3650 天",
+      "legacy_category": "系统",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_wu_max_pause",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "extend_wu_pause_limit",
+      "new_preset": "privacy",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_wu_max_pause 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "mapsbroker",
+      "legacy_name": "禁用 MapsBroker 地图服务",
+      "legacy_category": "服务",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_disable_mapsbroker",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "merged",
+      "new_id": "disable_safe_services",
+      "new_preset": "safe",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_disable_mapsbroker 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版禁用 MapsBroker 服务已合并到新版 disable_safe_services 优化项，统一审计低副作用后台服务。"
+    },
+    {
+      "legacy_id": "svc_safe",
+      "legacy_name": "禁用非必要服务 (Xbox/遥测/传真等)",
+      "legacy_category": "服务",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_disable_services_safe",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "disable_safe_services",
+      "new_preset": "safe",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_disable_services_safe 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "wifi_power",
+      "legacy_name": "禁用 WiFi 电源管理",
+      "legacy_category": "电源",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_wifi_power_disable",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_wifi_power",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": true,
+      "side_effects": [
+        "执行旧版函数 opt_wifi_power_disable 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "cpu_unpark",
+      "legacy_name": "CPU 核心全部唤醒 (Unpark)",
+      "legacy_category": "电源",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_cpu_unpark",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_cpu_unpark",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": true,
+      "side_effects": [
+        "执行旧版函数 opt_cpu_unpark 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "unlock_ppm",
+      "legacy_name": "解锁处理器电源管理高级选项",
+      "legacy_category": "电源",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_unlock_ppm",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_unlock_ppm",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": true,
+      "side_effects": [
+        "执行旧版函数 opt_unlock_ppm 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "energy_veto",
+      "legacy_name": "阻止放电降性能",
+      "legacy_category": "电源",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_energy_saver_veto",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_energy_veto",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": true,
+      "side_effects": [
+        "执行旧版函数 opt_energy_saver_veto 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "win32_pri",
+      "legacy_name": "进程优先级分离优化 (Win32PrioritySeparation)",
+      "legacy_category": "调度",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_win32_priority",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_win32_pri",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_win32_priority 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "low_latency2",
+      "legacy_name": "多媒体低延迟任务调度 (手感2)",
+      "legacy_category": "调度",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_low_latency_schedule",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_low_latency2",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_low_latency_schedule 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "dns_flush",
+      "legacy_name": "DNS 缓存清理",
+      "legacy_category": "清理",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_flush_dns",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "deprecated",
+      "new_id": "",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "会触发即时清理动作，可能清除缓存或临时文件。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "不进入新版自动 apply；如需复用，必须先设计可回滚替代方案。",
+      "decision_reason": "旧版为一次性命令或破坏性清理动作，不适合纳入新版可审计、可回滚预设。"
+    },
+    {
+      "legacy_id": "temp_clean",
+      "legacy_name": "临时文件清理",
+      "legacy_category": "清理",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_clean_temp",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "deprecated",
+      "new_id": "",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "会触发即时清理动作，可能清除缓存或临时文件。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "不进入新版自动 apply；如需复用，必须先设计可回滚替代方案。",
+      "decision_reason": "旧版为一次性命令或破坏性清理动作，不适合纳入新版可审计、可回滚预设。"
+    },
+    {
+      "legacy_id": "gaming_boost",
+      "legacy_name": "修复游戏 Boost (CPU 不锁频)",
+      "legacy_category": "电源",
+      "legacy_risk": "MEDIUM",
+      "legacy_apply_fn": "opt_fix_gaming_boost",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_gaming_boost",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": true,
+      "side_effects": [
+        "执行旧版函数 opt_fix_gaming_boost 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "gaming_preset",
+      "legacy_name": "完整电竞电源预设 (一键应用全部调校)",
+      "legacy_category": "电源",
+      "legacy_risk": "MEDIUM",
+      "legacy_apply_fn": "opt_apply_gaming_preset",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_gaming_preset",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": true,
+      "side_effects": [
+        "执行旧版函数 opt_apply_gaming_preset 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "power_perf",
+      "legacy_name": "禁用电源节流 + 高性能模式",
+      "legacy_category": "电源",
+      "legacy_risk": "MEDIUM",
+      "legacy_apply_fn": "opt_power_performance",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_power_perf",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": true,
+      "side_effects": [
+        "执行旧版函数 opt_power_performance 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "laptop_ac",
+      "legacy_name": "笔记本插电优化 (高性能+禁用节流)",
+      "legacy_category": "电源",
+      "legacy_risk": "MEDIUM",
+      "legacy_apply_fn": "opt_laptop_power_ac",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_laptop_ac",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": true,
+      "side_effects": [
+        "执行旧版函数 opt_laptop_power_ac 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "laptop_bat",
+      "legacy_name": "笔记本电池模式 (平衡方案)",
+      "legacy_category": "电源",
+      "legacy_risk": "MEDIUM",
+      "legacy_apply_fn": "opt_laptop_power_battery",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_laptop_bat",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": true,
+      "side_effects": [
+        "执行旧版函数 opt_laptop_power_battery 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "gpu_preempt",
+      "legacy_name": "禁用 GPU 抢占调度",
+      "legacy_category": "GPU",
+      "legacy_risk": "MEDIUM",
+      "legacy_apply_fn": "opt_disable_gpu_preemption",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_gpu_preempt",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": true,
+      "side_effects": [
+        "执行旧版函数 opt_disable_gpu_preemption 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "superfetch",
+      "legacy_name": "禁用 Superfetch / Prefetch",
+      "legacy_category": "磁盘",
+      "legacy_risk": "MEDIUM",
+      "legacy_apply_fn": "opt_disable_superfetch",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_superfetch",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": true,
+      "side_effects": [
+        "执行旧版函数 opt_disable_superfetch 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "large_cache",
+      "legacy_name": "提升系统缓存 / 内核常驻内存",
+      "legacy_category": "内存",
+      "legacy_risk": "MEDIUM",
+      "legacy_apply_fn": "opt_large_system_cache",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_large_cache",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": true,
+      "side_effects": [
+        "执行旧版函数 opt_large_system_cache 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "disable_mmcss",
+      "legacy_name": "完全禁用 MMCSS 服务",
+      "legacy_category": "服务",
+      "legacy_risk": "MEDIUM",
+      "legacy_apply_fn": "opt_disable_mmcss_service",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_disable_mmcss",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": true,
+      "side_effects": [
+        "执行旧版函数 opt_disable_mmcss_service 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "disk_no_sleep",
+      "legacy_name": "硬盘永不休眠",
+      "legacy_category": "磁盘",
+      "legacy_risk": "MEDIUM",
+      "legacy_apply_fn": "opt_disk_no_sleep",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_disk_no_sleep",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": true,
+      "side_effects": [
+        "执行旧版函数 opt_disk_no_sleep 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "low_latency3",
+      "legacy_name": "游戏低延迟全调度 (手感3)",
+      "legacy_category": "调度",
+      "legacy_risk": "MEDIUM",
+      "legacy_apply_fn": "opt_low_latency_full",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_low_latency3",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": true,
+      "side_effects": [
+        "执行旧版函数 opt_low_latency_full 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "wu_cache",
+      "legacy_name": "清理 Windows Update 缓存",
+      "legacy_category": "清理",
+      "legacy_risk": "MEDIUM",
+      "legacy_apply_fn": "opt_clean_wu_cache",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "deprecated",
+      "new_id": "",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "会触发即时清理动作，可能清除缓存或临时文件。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "不进入新版自动 apply；如需复用，必须先设计可回滚替代方案。",
+      "decision_reason": "旧版为一次性命令或破坏性清理动作，不适合纳入新版可审计、可回滚预设。"
+    },
+    {
+      "legacy_id": "telemetry_full",
+      "legacy_name": "扩展遥测禁用 (AppCompat+UAR)",
+      "legacy_category": "系统",
+      "legacy_risk": "MEDIUM",
+      "legacy_apply_fn": "opt_disable_telemetry_full",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "privacy_disable_compat_tasks",
+      "new_preset": "privacy",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_disable_telemetry_full 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "audio_no_excl",
+      "legacy_name": "禁用音频独占模式",
+      "legacy_category": "音频",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_disable_audio_exclusive",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "migrated",
+      "new_id": "disable_audio_exclusive",
+      "new_preset": "safe",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_disable_audio_exclusive 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目边界清晰，副作用可描述，可作为新版独立优化项落位。"
+    },
+    {
+      "legacy_id": "startup_delay",
+      "legacy_name": "禁用启动延迟",
+      "legacy_category": "启动",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_disable_startup_delay",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "disable_startup_delay",
+      "new_preset": "safe",
+      "new_risk": "green",
+      "requires_admin": false,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_disable_startup_delay 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "boot_timeout",
+      "legacy_name": "启动菜单超时设为 0",
+      "legacy_category": "启动",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_boot_timeout_zero",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "deprecated",
+      "new_id": "",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "启动菜单等待时间会被缩短到 0 秒。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "不进入新版自动 apply；如需复用，必须先设计可回滚替代方案。",
+      "decision_reason": "旧版为一次性命令或破坏性清理动作，不适合纳入新版可审计、可回滚预设。"
+    },
+    {
+      "legacy_id": "fse_global",
+      "legacy_name": "禁用全局全屏优化",
+      "legacy_category": "显示",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_disable_fso_global",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "migrated",
+      "new_id": "disable_fullscreen_optimizations",
+      "new_preset": "safe",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": true,
+      "side_effects": [
+        "执行旧版函数 opt_disable_fso_global 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目边界清晰，副作用可描述，可作为新版独立优化项落位。"
+    },
+    {
+      "legacy_id": "anim_disable",
+      "legacy_name": "禁用窗口动画效果",
+      "legacy_category": "显示",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_disable_animations",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "disable_anim_disable",
+      "new_preset": "safe",
+      "new_risk": "green",
+      "requires_admin": false,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_disable_animations 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "usb_suspend_dis",
+      "legacy_name": "禁用 USB 选择性暂停",
+      "legacy_category": "电源",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_usb_suspend_disable",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "migrated",
+      "new_id": "gaming_usb_suspend_off",
+      "new_preset": "safe",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_usb_suspend_disable 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目边界清晰，副作用可描述，可作为新版独立优化项落位。"
+    },
+    {
+      "legacy_id": "nic_nagle",
+      "legacy_name": "按网卡禁用 Nagle 算法",
+      "legacy_category": "网络",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_nic_disable_nagle",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_nic_nagle",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_nic_disable_nagle 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "nic_lso_disable",
+      "legacy_name": "禁用大包卸载 (LSO)",
+      "legacy_category": "网络",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_nic_disable_lso",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_nic_lso_disable",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_nic_disable_lso 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "disable_prefetch",
+      "legacy_name": "禁用 Prefetch 预读取",
+      "legacy_category": "磁盘",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_disable_prefetch",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "disable_disable_prefetch",
+      "new_preset": "safe",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_disable_prefetch 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "disable_bg_tasks",
+      "legacy_name": "禁用后台优化计划任务",
+      "legacy_category": "系统",
+      "legacy_risk": "LOW",
+      "legacy_apply_fn": "opt_disable_background_tasks",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "planned",
+      "new_id": "disable_disable_bg_tasks",
+      "new_preset": "privacy",
+      "new_risk": "green",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_disable_background_tasks 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；原值不存在则删除。",
+      "decision_reason": "旧版项目已纳入迁移矩阵，但具体动作仍需逐项复核后再实现。"
+    },
+    {
+      "legacy_id": "disable_mem_compress",
+      "legacy_name": "禁用内存压缩 (MEDIUM)",
+      "legacy_category": "内存",
+      "legacy_risk": "MEDIUM",
+      "legacy_apply_fn": "opt_disable_memory_compression",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "disable_disable_mem_compress",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_disable_memory_compression 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "timer_res",
+      "legacy_name": "系统定时器分辨率锁定 0.5ms (MEDIUM)",
+      "legacy_category": "调度",
+      "legacy_risk": "MEDIUM",
+      "legacy_apply_fn": "opt_lock_timer_resolution",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "experimental_timer_resolution_advisory",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": true,
+      "side_effects": [
+        "执行旧版函数 opt_lock_timer_resolution 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "gpu_msi_mode",
+      "legacy_name": "GPU MSI 中断模式 (MEDIUM)",
+      "legacy_category": "GPU",
+      "legacy_risk": "MEDIUM",
+      "legacy_apply_fn": "opt_gpu_msi_mode",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "experimental_gpu_msi_advisory",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": true,
+      "side_effects": [
+        "执行旧版函数 opt_gpu_msi_mode 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    },
+    {
+      "legacy_id": "nic_rss_opt",
+      "legacy_name": "网卡 RSS 接收端缩放优化",
+      "legacy_category": "网络",
+      "legacy_risk": "MEDIUM",
+      "legacy_apply_fn": "opt_nic_rss_optimize",
+      "targets": [
+        {
+          "type": "advisory",
+          "target": "legacy apply function requires review before implementation"
+        }
+      ],
+      "new_status": "experimental",
+      "new_id": "experimental_nic_rss_opt",
+      "new_preset": "experimental",
+      "new_risk": "red",
+      "requires_admin": true,
+      "requires_reboot": false,
+      "side_effects": [
+        "执行旧版函数 opt_nic_rss_optimize 可能改变相关系统配置或行为。"
+      ],
+      "verify": "读取相关注册表、服务、计划任务或 powercfg 状态，并与期望值比较；未确认目标前至少保留 advisory 复核说明。",
+      "rollback": "通过动作级备份恢复原值；若当前仅保留 advisory，则实现前禁止自动应用。",
+      "decision_reason": "旧版项目涉及硬件、调度或系统级行为，需先保留在 experimental 或 advisory 路径。"
+    }
+  ]
+}
