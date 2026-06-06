@@ -5,10 +5,10 @@ from PyInstaller.utils.hooks import collect_submodules
 hiddenimports = collect_submodules('haoyue_optimizer')
 
 a = Analysis(
-    ['C:\\Users\\Administrator\\haoyue_optimizer\\main.py'],
-    pathex=['C:\\Users\\Administrator'],
+    ['F:\\haoyue-optimizer\\haoyue_optimizer\\main.py'],
+    pathex=['F:\\haoyue-optimizer'],
     binaries=[],
-    datas=[('C:\\Users\\Administrator\\haoyue_optimizer\\data', 'haoyue_optimizer\\data')],
+    datas=[('F:\\haoyue-optimizer\\haoyue_optimizer\\data', 'haoyue_optimizer\\data')],
     hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={},

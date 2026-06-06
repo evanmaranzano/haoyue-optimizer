@@ -4,8 +4,8 @@ import json
 import unittest
 from pathlib import Path
 
-ROOT = Path("C:/Users/Administrator")
-MATRIX = ROOT / "haoyue_optimizer" / "data" / "migration_matrix.json"
+ROOT = Path(__file__).resolve().parent.parent / "haoyue_optimizer"
+MATRIX = ROOT / "data" / "migration_matrix.json"
 
 EXPECTED_LEGACY_IDS = {
     "gamedvr", "gamedvr_policy", "fse", "gamemode", "hags", "vrr", "mmcss_games",
