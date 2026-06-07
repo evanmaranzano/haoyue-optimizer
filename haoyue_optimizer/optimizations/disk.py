@@ -64,6 +64,20 @@ def get_optimizations() -> list[Optimization]:
             ],
         ),
         Optimization(
+            id="nvme_write_cache",
+            title="NVMe 写缓存与电源优化",
+            category="disk",
+            preset="safe",
+            risk="green",
+            evidence="medium",
+            benefit=["启用 NVMe 写缓存、禁用 Modern Standby 下的 NVMe D3 电源转换，减少睡眠唤醒延迟"],
+            side_effects=["NVMe D3 禁用后 Modern Standby 功耗略增"],
+            legacy_ids=[],
+            actions=[
+                RegistrySetAction("HKLM", r"SYSTEM\CurrentControlSet\Control\Storage", "StorageD3InModernStandby", 0, "dword"),
+            ],
+        ),
+        Optimization(
             id="disable_8_3_filenames",
             title="禁用 NTFS 8.3 短文件名",
             category="disk",

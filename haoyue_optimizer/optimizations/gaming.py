@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from haoyue_optimizer.core.models import Optimization
 from haoyue_optimizer.core.registry import RegistrySetAction
+from haoyue_optimizer.core.service import ServiceStartTypeAction
 
 
 def get_optimizations() -> list[Optimization]:
@@ -50,6 +51,21 @@ def get_optimizations() -> list[Optimization]:
             actions=[
                 RegistrySetAction("HKCU", r"SOFTWARE\Microsoft\GameBar", "UseNexusForGameBarEnabled", 0, "dword"),
                 RegistrySetAction("HKCU", r"SOFTWARE\Microsoft\GameBar", "ShowStartupPanel", 0, "dword"),
+                RegistrySetAction("HKCU", r"SOFTWARE\Microsoft\GameBar", "ShowGameBarTips", 0, "dword"),
+            ],
+        ),
+        Optimization(
+            id="disable_gpu_energy",
+            title="禁用 GPU 节能驱动",
+            category="gaming",
+            preset="safe",
+            risk="green",
+            evidence="medium",
+            benefit=["禁用 GpuEnergyDrv 减少 GPU 节流"],
+            side_effects=["GPU 不再受节能驱动限制"],
+            legacy_ids=[],
+            actions=[
+                ServiceStartTypeAction("GpuEnergyDrv", "disabled", stop=True),
             ],
         ),
         Optimization(

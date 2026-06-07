@@ -8,7 +8,7 @@ from haoyue_optimizer.core.backup import write_backup
 from haoyue_optimizer.core.power import WindowsPowerBackend
 from haoyue_optimizer.core.registry import WindowsRegistryBackend
 from haoyue_optimizer.core.scheduled_task import WindowsScheduledTaskBackend
-from haoyue_optimizer.core.service import WindowsServiceBackend
+from haoyue_optimizer.core.service import WindowsServiceBackend, ServiceNotModifiable
 from haoyue_optimizer.optimizations.catalog import get_optimizations
 
 
@@ -43,6 +43,13 @@ def apply_plan(
                 backend = _backend_for(action.action_type, registry_backend, service_backend, task_backend, power_backend)
                 action_backup = action.apply(backend)
                 action_backup["verify"] = action.verify(backend)
+            except ServiceNotModifiable as exc:
+                action_backup = {
+                    "action_id": action_plan.get("action_id", "unknown"),
+                    "target": action_plan.get("target", "unknown"),
+                    "before": action_plan.get("current"),
+                    "verify": {"status": "skipped", "detail": str(exc)},
+                }
             except Exception as exc:
                 action_backup = {
                     "action_id": action_plan.get("action_id", "unknown"),
