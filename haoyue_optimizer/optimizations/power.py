@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from haoyue_optimizer.core.models import Optimization
-from haoyue_optimizer.core.power import PowerCfgSetAction
+from haoyue_optimizer.core.power import PowerCfgSetAction, PowerCfgSetActiveAction
 from haoyue_optimizer.core.registry import RegistrySetAction
 
 USB_SUBGROUP = "2a737441-1930-4402-8d77-b2bebba308a3"
@@ -84,6 +84,7 @@ def get_optimizations() -> list[Optimization]:
             legacy_ids=["gaming_preset"],
             requires_admin=True,
             actions=[
+                PowerCfgSetActiveAction(_action_id="power:gp:set_balanced"),
                 PowerCfgSetAction(DISK_SUBGROUP, DISK_IDLE, ac=30, dc=60),
                 PowerCfgSetAction(SLEEP_SUBGROUP, SLEEP_TIMEOUT, ac=0, dc=0),
                 PowerCfgSetAction(SLEEP_SUBGROUP, HYBRID_SLEEP, ac=0, dc=0),
@@ -131,6 +132,7 @@ def get_optimizations() -> list[Optimization]:
             legacy_ids=["laptop_ac"],
             requires_admin=True,
             actions=[
+                PowerCfgSetActiveAction(_action_id="power:laptop_ac:set_balanced"),
                 PowerCfgSetAction(CPU_SUBGROUP, CPU_MIN, ac=100, dc=100, _action_id="power:laptop_ac:cpu_min"),
                 PowerCfgSetAction(CPU_SUBGROUP, CPU_BOOST, ac=3, dc=3, _action_id="power:laptop_ac:cpu_boost"),
                 PowerCfgSetAction(CPU_SUBGROUP, CPU_HETERO_POLICY, ac=0, dc=0, _action_id="power:laptop_ac:hetero_policy"),

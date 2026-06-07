@@ -101,3 +101,45 @@ class PowerCfgSetAction:
     def rollback(self, backend, before: dict[str, Any]) -> None:
         backend.set_value(before["scheme"], self.subgroup, self.setting, before["ac"], before["dc"])
         backend.set_active_scheme(before["scheme"])
+
+
+BALANCED_GUID = "381b4222-f694-41f0-9685-ff5bb260df2e"
+
+
+@dataclass(frozen=True)
+class PowerCfgSetActiveAction:
+    scheme: str = BALANCED_GUID
+    _action_id: str | None = None
+
+    @property
+    def action_id(self) -> str:
+        if self._action_id is not None:
+            return self._action_id
+        return f"power:set_active:{self.scheme}"
+
+    @property
+    def action_type(self) -> str:
+        return "powercfg_set"
+
+    @property
+    def target(self) -> str:
+        return f"powercfg:/setactive:{self.scheme}"
+
+    def current(self, backend) -> dict[str, Any]:
+        return {"exists": True, "scheme": backend.get_active_scheme()}
+
+    def desired(self) -> dict[str, Any]:
+        return {"exists": True, "scheme": self.scheme}
+
+    def apply(self, backend) -> dict[str, Any]:
+        before = self.current(backend)
+        backend.set_active_scheme(self.scheme)
+        return {"action_id": self.action_id, "action_type": self.action_type, "target": self.target, "before": before}
+
+    def verify(self, backend) -> dict[str, Any]:
+        current = backend.get_active_scheme()
+        return {"status": "passed" if current == self.scheme else "failed", "current": current, "expected": self.scheme}
+
+    def rollback(self, backend, before: dict[str, Any]) -> None:
+        old = before.get("scheme", BALANCED_GUID)
+        backend.set_active_scheme(old)
