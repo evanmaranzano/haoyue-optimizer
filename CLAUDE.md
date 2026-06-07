@@ -2,7 +2,7 @@
 
 ## 项目定位
 
-皓月定制优化工具 v2：Windows 系统优化 CLI，两档预设（safe/aggressive），从旧版单文件迁移为模块化结构。
+皓月定制优化工具：Windows 系统优化 CLI，两档预设（safe/aggressive），从旧版单文件迁移为模块化结构。
 
 ## 关键命令
 
@@ -15,8 +15,8 @@ $env:PYTHONPATH='F:/haoyue-optimizer'
 python -m haoyue_optimizer.main doctor
 python -m haoyue_optimizer.main plan --preset safe --out safe-plan.json
 
-# 打包
-C:/Users/Administrator/build_env/Scripts/pyinstaller.exe F:/haoyue-optimizer/皓月定制优化工具-v2.spec --distpath F:/haoyue-optimizer/dist --workpath F:/haoyue-optimizer/build
+# 打包（spec 文件名含版本号，版本号变了要改 spec 文件名和 exe name）
+C:/Users/Administrator/build_env/Scripts/pyinstaller.exe F:/haoyue-optimizer/皓月定制优化工具-v3.spec --distpath F:/haoyue-optimizer/dist --workpath F:/haoyue-optimizer/build
 ```
 
 ## 安全边界
@@ -46,5 +46,8 @@ C:/Users/Administrator/build_env/Scripts/pyinstaller.exe F:/haoyue-optimizer/皓
 - 循环导入：UI 模块需要共享常量时，把常量放到 `__init__.py`（如 PRESETS），不要从 main.py 导入
 - 测试路径：用 `Path(__file__).resolve().parent.parent` 做相对引用，不要硬编码绝对路径
 - MINGW64 终端 exe 输出中文乱码，Windows cmd/PowerShell 正常
+- Defender WMI Autologgers（`DefenderApiLogger`/`DefenderAuditLogger`）ACL 保护，管理员也写不进去，必须排除
+- 电源方案优化必须先切平衡（`PowerCfgSetActiveAction`）再改参数，不能直接改当前方案
+- 构建时 exe 被占用需先 `taskkill //F //IM "皓月定制优化工具-v3.0.2.exe"`
 - 批量替换 preset：`sed -i 's/preset="old"/preset="new"/g' file1.py file2.py`
 - 测试命令：`cd F:/haoyue-optimizer && $env:PYTHONPATH='F:/haoyue-optimizer'; python -m unittest discover -s tests -t . -v`
