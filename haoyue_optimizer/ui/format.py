@@ -30,7 +30,7 @@ def risk_color(risk: str) -> str:
 
 def banner() -> str:
     title = f"皓月定制优化工具  v{VERSION}"
-    title_en = "Haoyue System Optimizer v2"
+    title_en = f"Haoyue System Optimizer v{VERSION}"
     w = 50
     title_cols = sum(2 if ord(c) > 0x7f else 1 for c in title)
     l1 = (w - title_cols) // 2

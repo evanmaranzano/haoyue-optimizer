@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from haoyue_optimizer.core.advisory import AdvisoryAction
 from haoyue_optimizer.core.cleanup import FileCleanupAction
 from haoyue_optimizer.core.models import Optimization
 from haoyue_optimizer.core.registry import RegistrySetAction
+from haoyue_optimizer.core.subprocess_action import SubprocessAction
 
 
 def get_optimizations() -> list[Optimization]:
@@ -33,10 +33,14 @@ def get_optimizations() -> list[Optimization]:
             side_effects=["SSD 优化需要 fsutil 命令，本阶段只生成提示，不自动执行"],
             legacy_ids=["ssd_opt"],
             actions=[
-                AdvisoryAction(
-                    action_id="advisory:ssd_opt",
-                    target="fsutil behavior",
-                    message="SSD 优化需要 fsutil 命令，本阶段只生成提示，不自动执行。",
+                SubprocessAction(
+                    action_id="subprocess:ssd_opt",
+                    target="fsutil behavior settings",
+                    apply_cmd=[
+                        "powershell", "-Command",
+                        "fsutil behavior set DisableDeleteNotify 0 | Out-Null; fsutil behavior set EncryptPagingFile 0 | Out-Null; fsutil 8dot3name set 0 | Out-Null",
+                    ],
+                    verify_cmd=["powershell", "-Command", "if((fsutil behavior query DisableDeleteNotify) -match 'DisableDeleteNotify = 0'){exit 0}else{exit 1}"],
                 ),
             ],
         ),
@@ -57,6 +61,34 @@ def get_optimizations() -> list[Optimization]:
                     target="TEMP and Windows\\Temp",
                     max_age_seconds=7 * 24 * 3600,
                 ),
+            ],
+        ),
+        Optimization(
+            id="disable_8_3_filenames",
+            title="禁用 NTFS 8.3 短文件名",
+            category="disk",
+            preset="safe",
+            risk="green",
+            evidence="medium",
+            benefit=["减少 NTFS 创建短文件名的额外开销"],
+            side_effects=["16 位应用依赖的 8.3 短文件名不再自动生成"],
+            legacy_ids=[],
+            actions=[
+                RegistrySetAction("HKLM", r"SYSTEM\CurrentControlSet\Control\FileSystem", "NtfsDisable8dot3NameCreation", 1, "dword"),
+            ],
+        ),
+        Optimization(
+            id="disable_last_access_update",
+            title="禁用 NTFS 最后访问时间更新",
+            category="disk",
+            preset="safe",
+            risk="green",
+            evidence="medium",
+            benefit=["减少每次文件访问时的磁盘写入开销"],
+            side_effects=["文件最后访问时间不再更新，可能影响某些备份和归档工具"],
+            legacy_ids=[],
+            actions=[
+                RegistrySetAction("HKLM", r"SYSTEM\CurrentControlSet\Control\FileSystem", "NtfsDisableLastAccessUpdate", 0x80000003, "dword"),
             ],
         ),
     ]

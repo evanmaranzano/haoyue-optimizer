@@ -19,7 +19,10 @@ def build_plan(preset: str, registry_backend=None, service_backend=None, task_ba
     items = []
 
     for optimization in get_optimizations():
-        if optimization.preset != preset:
+        if preset == "aggressive":
+            if optimization.preset not in ("safe", "aggressive"):
+                continue
+        elif optimization.preset != preset:
             continue
         actions = []
         for action in optimization.actions:
@@ -68,5 +71,7 @@ def _backend_for(action_type: str, registry_backend, service_backend, task_backe
     if action_type == "advisory":
         return None
     if action_type == "file_cleanup":
+        return None
+    if action_type == "subprocess":
         return None
     raise ValueError(f"unsupported action type: {action_type}")

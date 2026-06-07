@@ -27,6 +27,7 @@ class FakePowerBackend:
 class WindowsPowerBackend:
     def get_active_scheme(self) -> str:
         result = subprocess.run(["powercfg", "/getactivescheme"], capture_output=True)
+        # GUID bytes are always ASCII, search raw bytes
         match = re.search(rb"([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})", result.stdout)
         return match.group(1).decode("ascii") if match else "SCHEME_CURRENT"
 
@@ -35,7 +36,17 @@ class WindowsPowerBackend:
 
     def get_value(self, scheme: str, subgroup: str, setting: str) -> dict[str, int]:
         result = subprocess.run(["powercfg", "/query", scheme, subgroup, setting], capture_output=True)
-        text = result.stdout.decode("gbk", errors="replace")
+        text = None
+        for enc in ("utf-8", "gbk", "gb2312"):
+            try:
+                decoded = result.stdout.decode(enc)
+                if "当前" in decoded or "GUID" in decoded:
+                    text = decoded
+                    break
+            except (UnicodeDecodeError, LookupError):
+                continue
+        if text is None:
+            text = result.stdout.decode("gbk", errors="replace")
         matches = re.findall(r"当前(?:交流|直流).*?:\s*(0x[0-9a-fA-F]+)", text)
         if len(matches) >= 2:
             return {"ac": int(matches[0], 16), "dc": int(matches[1], 16)}

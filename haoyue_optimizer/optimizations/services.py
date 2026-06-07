@@ -1,30 +1,152 @@
 from __future__ import annotations
 
 from haoyue_optimizer.core.models import Optimization
+from haoyue_optimizer.core.registry import RegistrySetAction
 from haoyue_optimizer.core.service import ServiceStartTypeAction
 
 
 def get_optimizations() -> list[Optimization]:
     return [
         Optimization(
-            id="disable_safe_services",
-            title="禁用低副作用后台服务",
+            id="disable_xbl_auth",
+            title="禁用 Xbox 认证服务",
             category="services",
             preset="safe",
             risk="green",
             evidence="medium",
-            benefit=["减少 Xbox、地图、传真、远程注册表和遥测相关后台服务"],
-            side_effects=["Xbox 联动、地图后台下载、传真、远程注册表和错误上传不可用"],
-            legacy_ids=["mapsbroker", "svc_safe"],
+            benefit=["减少 Xbox 认证相关后台服务资源占用"],
+            side_effects=["Xbox Live 认证不可用，Xbox 联动功能受影响"],
+            legacy_ids=[],
             actions=[
                 ServiceStartTypeAction("XblAuthManager", "disabled", stop=True),
+            ],
+        ),
+        Optimization(
+            id="disable_xbl_gamesave",
+            title="禁用 Xbox 存档同步服务",
+            category="services",
+            preset="safe",
+            risk="green",
+            evidence="medium",
+            benefit=["减少 Xbox 存档同步后台服务资源占用"],
+            side_effects=["Xbox 游戏存档云同步不可用"],
+            legacy_ids=[],
+            actions=[
                 ServiceStartTypeAction("XblGameSave", "disabled", stop=True),
+            ],
+        ),
+        Optimization(
+            id="disable_xbox_netapi",
+            title="禁用 Xbox 网络服务",
+            category="services",
+            preset="safe",
+            risk="green",
+            evidence="medium",
+            benefit=["减少 Xbox 网络API后台服务资源占用"],
+            side_effects=["Xbox 网络功能不可用"],
+            legacy_ids=[],
+            actions=[
                 ServiceStartTypeAction("XboxNetApiSvc", "disabled", stop=True),
+            ],
+        ),
+        Optimization(
+            id="disable_maps_broker",
+            title="禁用地图下载服务",
+            category="services",
+            preset="safe",
+            risk="green",
+            evidence="medium",
+            benefit=["停止地图数据后台下载和服务"],
+            side_effects=["离线地图功能不可用"],
+            legacy_ids=["mapsbroker"],
+            actions=[
                 ServiceStartTypeAction("MapsBroker", "disabled", stop=True),
+            ],
+        ),
+        Optimization(
+            id="disable_diagtrack",
+            title="禁用诊断跟踪服务",
+            category="services",
+            preset="safe",
+            risk="green",
+            evidence="high",
+            benefit=["停止 Connected User Experiences 遥测数据收集"],
+            side_effects=["Windows 遥测和诊断数据收集停止"],
+            legacy_ids=["svc_safe"],
+            actions=[
                 ServiceStartTypeAction("DiagTrack", "disabled", stop=True),
+            ],
+        ),
+        Optimization(
+            id="disable_remote_registry",
+            title="禁用远程注册表服务",
+            category="services",
+            preset="safe",
+            risk="green",
+            evidence="high",
+            benefit=["阻止远程注册表访问，提升安全性"],
+            side_effects=["远程注册表访问不可用"],
+            legacy_ids=[],
+            actions=[
                 ServiceStartTypeAction("RemoteRegistry", "disabled", stop=True),
+            ],
+        ),
+        Optimization(
+            id="disable_fax",
+            title="禁用传真服务",
+            category="services",
+            preset="safe",
+            risk="green",
+            evidence="high",
+            benefit=["停止传真服务后台资源占用"],
+            side_effects=["传真功能不可用"],
+            legacy_ids=[],
+            actions=[
                 ServiceStartTypeAction("Fax", "disabled", stop=True),
+            ],
+        ),
+        Optimization(
+            id="disable_wersvc",
+            title="禁用 Windows 错误报告服务",
+            category="services",
+            preset="safe",
+            risk="green",
+            evidence="medium",
+            benefit=["停止错误报告自动上传"],
+            side_effects=["应用崩溃时不再自动生成错误报告"],
+            legacy_ids=[],
+            actions=[
                 ServiceStartTypeAction("WerSvc", "disabled", stop=True),
+            ],
+        ),
+        Optimization(
+            id="disable_ucpd",
+            title="禁用用户选择保护驱动",
+            category="services",
+            preset="aggressive",
+            risk="yellow",
+            evidence="medium",
+            benefit=["禁用 UCPD 驱动，解除部分默认应用锁定限制"],
+            side_effects=["UCPD 驱动禁用，Windows 默认应用保护机制失效"],
+            legacy_ids=[],
+            requires_admin=True,
+            actions=[
+                RegistrySetAction("HKLM", r"SYSTEM\CurrentControlSet\Services\UCPD", "Start", 4, "dword"),
+            ],
+        ),
+        Optimization(
+            id="disable_sensor_services",
+            title="禁用传感器监控服务",
+            category="services",
+            preset="safe",
+            risk="green",
+            evidence="medium",
+            benefit=["停止传感器监控和数据采集服务"],
+            side_effects=["传感器相关功能（自动旋转、环境光等）不可用"],
+            legacy_ids=[],
+            actions=[
+                ServiceStartTypeAction("SensrSvc", "disabled", stop=True),
+                ServiceStartTypeAction("SensorDataService", "disabled", stop=True),
             ],
         ),
         Optimization(

@@ -19,6 +19,7 @@ def apply_plan(
     task_backend=None,
     power_backend=None,
     write_file: bool = True,
+    on_progress=None,
 ) -> dict[str, Any]:
     registry_backend = registry_backend or WindowsRegistryBackend()
     service_backend = service_backend or WindowsServiceBackend()
@@ -53,6 +54,8 @@ def apply_plan(
             backup_item["actions"].append(action_backup)
         backup_item["status"] = _combine_statuses(item_statuses)
         backup["items"].append(backup_item)
+        if on_progress:
+            on_progress(item["title"], backup_item["status"], item_statuses)
 
     if write_file:
         path = write_backup(backup)
@@ -106,6 +109,8 @@ def _backend_for(action_type: str, registry_backend, service_backend, task_backe
     if action_type == "advisory":
         return None
     if action_type == "file_cleanup":
+        return None
+    if action_type == "subprocess":
         return None
     raise ValueError(f"unsupported action type: {action_type}")
 

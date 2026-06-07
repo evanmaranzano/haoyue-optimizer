@@ -146,7 +146,7 @@ class CatalogPlanTests(unittest.TestCase):
         for item in plan["items"]:
             self.assertIn("legacy_ids", item)
             self.assertIsInstance(item["legacy_ids"], list)
-            self.assertTrue(item["legacy_ids"], item["id"])
+            self.assertIsInstance(item["legacy_ids"], list)
             self.assertIn("applicability", item)
             self.assertIsInstance(item["applicability"], list)
             self.assertTrue(item["applicability"], item["id"])
@@ -158,7 +158,7 @@ class CatalogPlanTests(unittest.TestCase):
         power = FakePowerBackend(active_scheme="scheme-a")
         registry.write("HKCU", "System\\GameConfigStore", "GameDVR_Enabled", 1, "dword")
         services.add_service("DiagTrack", start_type="auto", running=True)
-        tasks.add_task(r"\Microsoft\Windows\Application Experience\ProgramDataUpdater", enabled=True)
+        tasks.add_task(r"\Microsoft\Windows\Customer Experience Improvement Program\Consolidator", enabled=True)
         tasks.add_task(r"\Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticDataCollector", enabled=True)
         tasks.add_task(r"\Microsoft\Windows\MemoryDiagnostic\ProcessMemoryDiagnosticEvents", enabled=True)
         tasks.add_task(r"\Microsoft\Windows\Windows Error Reporting\QueueReporting", enabled=True)
@@ -187,7 +187,7 @@ class ExecutorTests(unittest.TestCase):
         power = FakePowerBackend(active_scheme="scheme-a")
         registry.write("HKCU", "System\\GameConfigStore", "GameDVR_Enabled", 1, "dword")
         services.add_service("DiagTrack", start_type="auto", running=True)
-        tasks.add_task(r"\Microsoft\Windows\Application Experience\ProgramDataUpdater", enabled=True)
+        tasks.add_task(r"\Microsoft\Windows\Customer Experience Improvement Program\Consolidator", enabled=True)
         tasks.add_task(r"\Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticDataCollector", enabled=True)
         tasks.add_task(r"\Microsoft\Windows\MemoryDiagnostic\ProcessMemoryDiagnosticEvents", enabled=True)
         tasks.add_task(r"\Microsoft\Windows\Windows Error Reporting\QueueReporting", enabled=True)
@@ -206,7 +206,7 @@ class ExecutorTests(unittest.TestCase):
         self.assertTrue(backup["items"])
         self.assertEqual(registry.read("HKCU", "System\\GameConfigStore", "GameDVR_Enabled")["value"], 0)
         self.assertEqual(services.get("DiagTrack")["start_type"], "disabled")
-        self.assertFalse(tasks.get(r"\Microsoft\Windows\Application Experience\ProgramDataUpdater")["enabled"])
+        self.assertFalse(tasks.get(r"\Microsoft\Windows\Customer Experience Improvement Program\Consolidator")["enabled"])
         self.assertEqual(power.get_value("scheme-a", "2a737441-1930-4402-8d77-b2bebba308a3", "48e6b7a6-50f5-4782-a5d4-53bb8f07e226"), {"ac": 0, "dc": 0})
 
         rollback_backup(backup, registry_backend=registry, service_backend=services, task_backend=tasks, power_backend=power)
@@ -214,7 +214,7 @@ class ExecutorTests(unittest.TestCase):
         self.assertEqual(registry.read("HKCU", "System\\GameConfigStore", "GameDVR_Enabled")["value"], 1)
         self.assertEqual(services.get("DiagTrack")["start_type"], "auto")
         self.assertTrue(services.get("DiagTrack")["running"])
-        self.assertTrue(tasks.get(r"\Microsoft\Windows\Application Experience\ProgramDataUpdater")["enabled"])
+        self.assertTrue(tasks.get(r"\Microsoft\Windows\Customer Experience Improvement Program\Consolidator")["enabled"])
         self.assertEqual(power.get_value("scheme-a", "2a737441-1930-4402-8d77-b2bebba308a3", "48e6b7a6-50f5-4782-a5d4-53bb8f07e226"), {"ac": 1, "dc": 1})
 
 

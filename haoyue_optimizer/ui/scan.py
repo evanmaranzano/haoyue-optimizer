@@ -7,6 +7,9 @@ def classify_action(action: dict[str, Any]) -> str:
     action_type = action.get("type")
     if action_type in {"advisory", "file_cleanup"}:
         return "advisory"
+    if action_type == "subprocess":
+        current = action.get("current", {})
+        return "applied" if current.get("status") == "applied" else "missing"
     current = action.get("current", {})
     desired = action.get("desired", {})
     if _matches(current, desired):

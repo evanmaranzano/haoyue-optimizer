@@ -54,6 +54,20 @@ def get_optimizations() -> list[Optimization]:
             ],
         ),
         Optimization(
+            id="enable_dx_flip_model",
+            title="启用 DirectX Flip Model",
+            category="display",
+            preset="aggressive",
+            risk="yellow",
+            evidence="medium",
+            benefit=["强制启用 Flip Model 呈现模式，减少帧延迟并改善 VSync/VRR 兼容性"],
+            side_effects=["部分旧应用可能不兼容 Flip Model"],
+            legacy_ids=[],
+            actions=[
+                RegistrySetAction("HKCU", r"SOFTWARE\Microsoft\DirectX\UserGpuPreferences", "DirectXUserGlobalSettings", "SwapEffectUpgradeEnable=1;VRROptimizeEnable=0;", "sz", qualifier="flip"),
+            ],
+        ),
+        Optimization(
             id="disable_audio_exclusive",
             title="禁用音频独占模式",
             category="audio",

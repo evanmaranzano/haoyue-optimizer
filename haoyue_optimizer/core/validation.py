@@ -9,6 +9,7 @@ ALLOWED_ACTION_TYPES = {
     "powercfg_set",
     "advisory",
     "file_cleanup",
+    "subprocess",
 }
 
 ALLOWED_STATUSES = {"passed", "failed", "skipped", "unsupported", "pending_reboot", "partial"}

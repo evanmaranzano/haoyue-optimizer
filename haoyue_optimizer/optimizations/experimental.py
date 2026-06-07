@@ -3,6 +3,8 @@ from __future__ import annotations
 from haoyue_optimizer.core.advisory import AdvisoryAction
 from haoyue_optimizer.core.models import Optimization
 from haoyue_optimizer.core.registry import RegistrySetAction
+from haoyue_optimizer.core.service import ServiceStartTypeAction
+from haoyue_optimizer.core.subprocess_action import SubprocessAction
 
 
 def get_optimizations() -> list[Optimization]:
@@ -23,41 +25,36 @@ def get_optimizations() -> list[Optimization]:
             requires_admin=True,
             requires_reboot=True,
             actions=[
-                AdvisoryAction(
-                    action_id="advisory:gpu_msi_mode",
-                    target="GPU MSI mode",
-                    message=(
-                        "GPU MSI (Message Signaled Interrupts) 模式可减少中断延迟，"
-                        "但自动写入注册表存在硬件兼容风险。请使用 MSI Mode Utility "
-                        "手动检测并启用。本工具不会自动修改此项。"
-                    ),
+                SubprocessAction(
+                    action_id="subprocess:gpu_msi_mode",
+                    target="GPU MSI mode via PCI enumeration",
+                    apply_cmd=[
+                        "powershell", "-Command",
+                        "Get-ChildItem 'HKLM:\\SYSTEM\\CurrentControlSet\\Enum\\PCI' -ErrorAction SilentlyContinue | ForEach-Object { Get-ChildItem $_.PSPath -ErrorAction SilentlyContinue | ForEach-Object { if((Get-ItemProperty $_.PSPath -Name 'ClassGUID' -ErrorAction SilentlyContinue).ClassGUID -eq '{4d36e968-e325-11ce-bfc1-08002be10318}'){ $p=Join-Path $_.PSPath 'Device Parameters\\Interrupt Management\\MessageSignaledInterruptProperties'; if(Test-Path $p){ Set-ItemProperty $p 'MSISupported' 1 -Type DWord } } } }",
+                    ],
+                    verify_cmd=[
+                        "powershell", "-Command",
+                        "$found=0; Get-ChildItem 'HKLM:\\SYSTEM\\CurrentControlSet\\Enum\\PCI' -ErrorAction SilentlyContinue | ForEach-Object { Get-ChildItem $_.PSPath -ErrorAction SilentlyContinue | ForEach-Object { if((Get-ItemProperty $_.PSPath -Name 'ClassGUID' -ErrorAction SilentlyContinue).ClassGUID -eq '{4d36e968-e325-11ce-bfc1-08002be10318}'){ $p=Join-Path $_.PSPath 'Device Parameters\\Interrupt Management\\MessageSignaledInterruptProperties'; if(Test-Path $p){ $v=(Get-ItemProperty $p -ErrorAction SilentlyContinue).MSISupported; if($v -eq 1){$found++} } } } }; if($found -gt 0){exit 0}else{exit 1}",
+                    ],
                 ),
             ],
         ),
         Optimization(
-            id="experimental_timer_resolution_advisory",
-            title="系统定时器分辨率检测提示",
+            id="experimental_timer_resolution",
+            title="启用全局定时器高精度请求",
             category="system",
             preset="aggressive",
             risk="red",
             evidence="low",
-            benefit=["提示当前系统定时器分辨率状态"],
-            side_effects=[
-                "仅提供信息，不做任何写入",
-                "修改定时器分辨率可能增加功耗",
-            ],
+            benefit=["允许进程请求高精度定时器分辨率，减少帧时间抖动"],
+            side_effects=["定时器分辨率提高可能增加功耗"],
             legacy_ids=["timer_res"],
             requires_admin=True,
-            requires_reboot=False,
+            requires_reboot=True,
             actions=[
-                AdvisoryAction(
-                    action_id="advisory:timer_res",
-                    target="Timer resolution",
-                    message=(
-                        "Windows 默认定时器分辨率 15.6ms，部分游戏和低延迟场景建议 "
-                        "1ms。但系统级修改可能导致功耗增加和睡眠中断。请使用 "
-                        "TimerTool 或 Windows 内置工具手动调整。本工具不会自动修改此项。"
-                    ),
+                RegistrySetAction(
+                    "HKLM", r"SYSTEM\CurrentControlSet\Control\Session Manager\kernel",
+                    "GlobalTimerResolutionRequests", 1, "dword",
                 ),
             ],
         ),
@@ -72,7 +69,7 @@ def get_optimizations() -> list[Optimization]:
             side_effects=["预取和 Superfetch 关闭，应用启动可能变慢"],
             legacy_ids=["superfetch"],
             actions=[
-                RegistrySetAction("HKLM", r"SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters", "EnableSuperfetch", 0, "dword"),
+                ServiceStartTypeAction("SysMain", "disabled", stop=True),
             ],
         ),
         Optimization(

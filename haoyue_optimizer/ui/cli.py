@@ -222,9 +222,24 @@ def execute_plan(plan: dict) -> None:
         print(f"  {YELLOW}已取消{RESET}")
         return
 
-    print(f"\n  {BOLD}执行中...{RESET}")
+    print(f"\n  {BOLD}执行中...{RESET}\n")
     start = time.time()
-    backup = apply_plan(plan)
+
+    def on_progress(title: str, status: str, action_statuses: list[str]) -> None:
+        passed = sum(1 for s in action_statuses if s == "passed")
+        skipped = sum(1 for s in action_statuses if s in ("skipped", "unsupported"))
+        failed = sum(1 for s in action_statuses if s not in ("passed", "skipped", "unsupported"))
+        parts = []
+        if passed:
+            parts.append(f"{GREEN}{passed}✓{RESET}")
+        if skipped:
+            parts.append(f"{DIM}{skipped}⊘{RESET}")
+        if failed:
+            parts.append(f"{RED}{failed}✗{RESET}")
+        icon = f"{GREEN}✓{RESET}" if not failed and not skipped else (f"{YELLOW}⊘{RESET}" if not failed else f"{RED}✗{RESET}")
+        print(f"    {icon} {title}  ({', '.join(parts)})")
+
+    backup = apply_plan(plan, on_progress=on_progress)
     elapsed = time.time() - start
     report_path = export_report(plan, backup)
     print_execution_result(backup, report_path, elapsed)
@@ -285,6 +300,7 @@ def format_apply_summary(summary: dict) -> str:
 
 def print_execution_result(backup: dict, report_path: Path, elapsed: float) -> None:
     ok = fail = skip = 0
+    skipped_details: list[str] = []
     for item in backup.get("items", []):
         for act in item.get("actions", []):
             status = act.get("verify", {}).get("status", "failed")
@@ -292,6 +308,7 @@ def print_execution_result(backup: dict, report_path: Path, elapsed: float) -> N
                 ok += 1
             elif status in ("skipped", "unsupported"):
                 skip += 1
+                skipped_details.append(f"{item.get('title', '?')} → {act.get('action_id', '?')}")
             else:
                 fail += 1
     print(f"\n  {BOLD}执行完成{RESET} ({elapsed:.1f}s)")
@@ -299,6 +316,8 @@ def print_execution_result(backup: dict, report_path: Path, elapsed: float) -> N
     print(f"    {GREEN}✓ 成功: {ok}{RESET}")
     if skip:
         print(f"    {DIM}⊘ 跳过: {skip}{RESET}")
+        for detail in skipped_details:
+            print(f"      {DIM}• {detail}{RESET}")
     if fail:
         print(f"    {RED}✗ 失败: {fail}{RESET}")
     print(f"\n    {DIM}报告: {report_path}{RESET}")

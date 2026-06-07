@@ -3,6 +3,7 @@ from __future__ import annotations
 from haoyue_optimizer.core.advisory import AdvisoryAction
 from haoyue_optimizer.core.models import Optimization
 from haoyue_optimizer.core.registry import RegistrySetAction
+from haoyue_optimizer.core.subprocess_action import SubprocessAction
 
 
 def get_optimizations() -> list[Optimization]:
@@ -99,29 +100,6 @@ def get_optimizations() -> list[Optimization]:
             ],
         ),
         Optimization(
-            id="disable_net_mem",
-            title="调整网络内存缓存策略",
-            category="network",
-            preset="aggressive",
-            risk="red",
-            evidence="low",
-            benefit=["调整系统缓存策略"],
-            side_effects=["仅提供提示，不自动写入；LargeSystemCache 已由 memory 模块管理"],
-            legacy_ids=["net_mem"],
-            requires_reboot=False,
-            actions=[
-                AdvisoryAction(
-                    action_id="advisory:net_mem_large_cache",
-                    target="HKLM...Memory Management\\LargeSystemCache",
-                    message=(
-                        "LargeSystemCache 属于内存管理设置，已由 memory 模块的 "
-                        "disable_large_cache 统一管理（设为 1）。"
-                        "本优化不再重复写入，避免冲突。"
-                    ),
-                ),
-            ],
-        ),
-        Optimization(
             id="disable_wifi_power",
             title="禁用 WiFi 电源管理",
             category="network",
@@ -147,10 +125,17 @@ def get_optimizations() -> list[Optimization]:
             legacy_ids=["nic_nagle"],
             requires_reboot=False,
             actions=[
-                AdvisoryAction(
-                    action_id="advisory:nic_nagle",
+                SubprocessAction(
+                    action_id="subprocess:nic_nagle",
                     target="per-NIC TcpAckFrequency/TCPNoDelay/TcpDelAckTicks",
-                    message="Nagle 算法禁用需要按网卡 GUID 枚举，本阶段只生成提示。",
+                    apply_cmd=[
+                        "powershell", "-Command",
+                        "Get-ChildItem 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces' | ForEach-Object { $ip=(Get-ItemProperty $_.PSPath -ErrorAction SilentlyContinue).DhcpIPAddress; if($ip -and $ip -ne '0.0.0.0'){ Set-ItemProperty $_.PSPath 'TcpAckFrequency' 1 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty $_.PSPath 'TCPNoDelay' 1 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty $_.PSPath 'TcpDelAckTicks' 0 -Type DWord -ErrorAction SilentlyContinue } }",
+                    ],
+                    verify_cmd=[
+                        "powershell", "-Command",
+                        "$ok=0; Get-ChildItem 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces' | ForEach-Object { $ip=(Get-ItemProperty $_.PSPath -ErrorAction SilentlyContinue).DhcpIPAddress; if($ip -and $ip -ne '0.0.0.0'){ $v=(Get-ItemProperty $_.PSPath -ErrorAction SilentlyContinue).TcpAckFrequency; if($v -eq 1){$ok++} } }; if($ok -gt 0){exit 0}else{exit 1}",
+                    ],
                 ),
             ],
         ),
@@ -166,10 +151,17 @@ def get_optimizations() -> list[Optimization]:
             legacy_ids=["nic_lso_disable"],
             requires_reboot=False,
             actions=[
-                AdvisoryAction(
-                    action_id="advisory:nic_lso_disable",
+                SubprocessAction(
+                    action_id="subprocess:nic_lso",
                     target="per-NIC LsoV2IPv4/LsoV2IPv6",
-                    message="LSO 禁用需要按网卡 GUID 枚举，本阶段只生成提示。",
+                    apply_cmd=[
+                        "powershell", "-Command",
+                        "Get-ChildItem 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces' | ForEach-Object { $ip=(Get-ItemProperty $_.PSPath -ErrorAction SilentlyContinue).DhcpIPAddress; if($ip -and $ip -ne '0.0.0.0'){ Set-ItemProperty $_.PSPath 'LsoV2IPv4' 0 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty $_.PSPath 'LsoV2IPv6' 0 -Type DWord -ErrorAction SilentlyContinue } }",
+                    ],
+                    verify_cmd=[
+                        "powershell", "-Command",
+                        "Get-ChildItem 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces' | ForEach-Object { $ip=(Get-ItemProperty $_.PSPath -ErrorAction SilentlyContinue).DhcpIPAddress; if($ip -and $ip -ne '0.0.0.0'){ $v=(Get-ItemProperty $_.PSPath -ErrorAction SilentlyContinue).LsoV2IPv4; if($v -eq 0){exit 0} } }; exit 1",
+                    ],
                 ),
             ],
         ),
@@ -185,10 +177,17 @@ def get_optimizations() -> list[Optimization]:
             legacy_ids=["nic_rss_opt"],
             requires_reboot=False,
             actions=[
-                AdvisoryAction(
-                    action_id="advisory:nic_rss_opt",
-                    target="per-NIC RSS settings",
-                    message="RSS 优化需要按网卡 GUID 枚举，本阶段只生成提示。",
+                SubprocessAction(
+                    action_id="subprocess:nic_rss",
+                    target="global EnableRSS + per-NIC RSS",
+                    apply_cmd=[
+                        "powershell", "-Command",
+                        "Set-ItemProperty 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters' 'EnableRSS' 1 -Type DWord -ErrorAction SilentlyContinue; Get-ChildItem 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces' | ForEach-Object { $ip=(Get-ItemProperty $_.PSPath -ErrorAction SilentlyContinue).DhcpIPAddress; if($ip -and $ip -ne '0.0.0.0'){ Set-ItemProperty $_.PSPath '*RSS' 1 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty $_.PSPath 'RSS' 1 -Type DWord -ErrorAction SilentlyContinue } }",
+                    ],
+                    verify_cmd=[
+                        "powershell", "-Command",
+                        "$v=(Get-ItemProperty 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters' -ErrorAction SilentlyContinue).EnableRSS; if($v -eq 1){exit 0}else{exit 1}",
+                    ],
                 ),
             ],
         ),

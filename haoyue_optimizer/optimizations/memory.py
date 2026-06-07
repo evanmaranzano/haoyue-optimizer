@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from haoyue_optimizer.core.advisory import AdvisoryAction
 from haoyue_optimizer.core.models import Optimization
 from haoyue_optimizer.core.registry import RegistrySetAction
+from haoyue_optimizer.core.subprocess_action import SubprocessAction
 
 
 def get_optimizations() -> list[Optimization]:
@@ -34,10 +34,12 @@ def get_optimizations() -> list[Optimization]:
             legacy_ids=["disable_mem_compress"],
             requires_reboot=False,
             actions=[
-                AdvisoryAction(
-                    action_id="advisory:disable_mem_compress",
-                    target="MemoryCompression",
-                    message="内存压缩禁用需要 PowerShell Disable-MMAgent 命令，本阶段只生成提示。",
+                SubprocessAction(
+                    action_id="subprocess:disable_mem_compress",
+                    target="Disable-MMAgent -MemoryCompression",
+                    apply_cmd=["powershell", "-Command", "Disable-MMAgent -MemoryCompression"],
+                    rollback_cmd=["powershell", "-Command", "Enable-MMAgent -MemoryCompression"],
+                    verify_cmd=["powershell", "-Command", "if((Get-MMAgent).MemoryCompression -eq $false){exit 0}else{exit 1}"],
                 ),
             ],
         ),

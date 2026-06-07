@@ -27,7 +27,7 @@ class WindowsScheduledTaskBackend:
             ["schtasks", "/Query", "/TN", path, "/FO", "LIST", "/V"],
             capture_output=True,
             text=True,
-            encoding="utf-8",
+            encoding="gbk",
             errors="ignore",
         )
         if result.returncode != 0:
@@ -38,7 +38,13 @@ class WindowsScheduledTaskBackend:
 
     def set_enabled(self, path: str, enabled: bool) -> None:
         state = "/ENABLE" if enabled else "/DISABLE"
-        subprocess.run(["schtasks", "/Change", "/TN", path, state], check=True, capture_output=True)
+        subprocess.run(
+            ["schtasks", "/Change", "/TN", path, state],
+            check=True,
+            capture_output=True,
+            encoding="gbk",
+            errors="ignore",
+        )
 
 
 @dataclass(frozen=True)

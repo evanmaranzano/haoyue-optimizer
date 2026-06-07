@@ -15,7 +15,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "disable_gamedvr",
       "new_preset": "gaming",
       "new_risk": "green",
@@ -90,7 +90,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "enable_gamemode",
       "new_preset": "gaming",
       "new_risk": "green",
@@ -190,7 +190,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
+      "new_status": "migrated",
       "new_id": "disable_net_throttle",
       "new_preset": "experimental",
       "new_risk": "red",
@@ -215,7 +215,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
+      "new_status": "migrated",
       "new_id": "disable_tcp_nodelay",
       "new_preset": "experimental",
       "new_risk": "red",
@@ -240,7 +240,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
+      "new_status": "migrated",
       "new_id": "disable_dns_priority",
       "new_preset": "experimental",
       "new_risk": "red",
@@ -265,7 +265,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
+      "new_status": "migrated",
       "new_id": "disable_dns_negative",
       "new_preset": "experimental",
       "new_risk": "red",
@@ -290,7 +290,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
+      "new_status": "migrated",
       "new_id": "disable_qos_bw",
       "new_preset": "experimental",
       "new_risk": "red",
@@ -315,7 +315,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
+      "new_status": "migrated",
       "new_id": "disable_qos_nla",
       "new_preset": "experimental",
       "new_risk": "red",
@@ -340,7 +340,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
+      "new_status": "migrated",
       "new_id": "disable_net_mem",
       "new_preset": "experimental",
       "new_risk": "red",
@@ -365,7 +365,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "disable_kb_opt",
       "new_preset": "safe",
       "new_risk": "green",
@@ -390,7 +390,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "disable_mouse_opt",
       "new_preset": "safe",
       "new_risk": "green",
@@ -415,7 +415,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "disable_sticky_keys",
       "new_preset": "safe",
       "new_risk": "green",
@@ -440,7 +440,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "disable_toggle_keys",
       "new_preset": "safe",
       "new_risk": "green",
@@ -465,7 +465,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "disable_access_all",
       "new_preset": "safe",
       "new_risk": "green",
@@ -490,7 +490,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "disable_ssd_opt",
       "new_preset": "safe",
       "new_risk": "green",
@@ -515,7 +515,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "disable_background_apps",
       "new_preset": "privacy",
       "new_risk": "green",
@@ -540,7 +540,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "disable_transparency",
       "new_preset": "safe",
       "new_risk": "green",
@@ -565,7 +565,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "disable_setting_sync",
       "new_preset": "privacy",
       "new_risk": "green",
@@ -590,7 +590,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "disable_content_delivery",
       "new_preset": "privacy",
       "new_risk": "green",
@@ -640,7 +640,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "disable_driver_search",
       "new_preset": "privacy",
       "new_risk": "green",
@@ -665,7 +665,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "disable_basic_telemetry",
       "new_preset": "privacy",
       "new_risk": "green",
@@ -690,7 +690,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "disable_svchost_thresh",
       "new_preset": "safe",
       "new_risk": "green",
@@ -715,7 +715,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "disable_file_alloc",
       "new_preset": "safe",
       "new_risk": "green",
@@ -740,7 +740,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "disable_admin_share",
       "new_preset": "safe",
       "new_risk": "green",
@@ -765,7 +765,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "disable_autorun",
       "new_preset": "safe",
       "new_risk": "green",
@@ -790,7 +790,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "disable_explorer_restart",
       "new_preset": "safe",
       "new_risk": "green",
@@ -815,7 +815,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "disable_map_download",
       "new_preset": "safe",
       "new_risk": "green",
@@ -890,7 +890,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "extend_wu_pause_limit",
       "new_preset": "privacy",
       "new_risk": "green",
@@ -940,8 +940,8 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
-      "new_id": "disable_safe_services",
+      "new_status": "migrated",
+      "new_id": "disable_diagtrack",
       "new_preset": "safe",
       "new_risk": "green",
       "requires_admin": true,
@@ -965,7 +965,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
+      "new_status": "migrated",
       "new_id": "disable_wifi_power",
       "new_preset": "experimental",
       "new_risk": "red",
@@ -990,7 +990,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
+      "new_status": "migrated",
       "new_id": "disable_cpu_unpark",
       "new_preset": "experimental",
       "new_risk": "red",
@@ -1015,7 +1015,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
+      "new_status": "migrated",
       "new_id": "disable_unlock_ppm",
       "new_preset": "experimental",
       "new_risk": "red",
@@ -1040,7 +1040,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
+      "new_status": "migrated",
       "new_id": "disable_energy_veto",
       "new_preset": "experimental",
       "new_risk": "red",
@@ -1065,7 +1065,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
+      "new_status": "migrated",
       "new_id": "disable_win32_pri",
       "new_preset": "experimental",
       "new_risk": "red",
@@ -1090,8 +1090,8 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
-      "new_id": "disable_low_latency2",
+      "new_status": "migrated",
+      "new_id": "experimental_low_latency2",
       "new_preset": "experimental",
       "new_risk": "red",
       "requires_admin": true,
@@ -1140,8 +1140,8 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "deprecated",
-      "new_id": "",
+      "new_status": "migrated",
+      "new_id": "experimental_temp_clean",
       "new_preset": "experimental",
       "new_risk": "red",
       "requires_admin": true,
@@ -1165,8 +1165,8 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
-      "new_id": "disable_gaming_boost",
+      "new_status": "migrated",
+      "new_id": "gaming_boost",
       "new_preset": "experimental",
       "new_risk": "red",
       "requires_admin": true,
@@ -1190,8 +1190,8 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
-      "new_id": "disable_gaming_preset",
+      "new_status": "migrated",
+      "new_id": "gaming_preset",
       "new_preset": "experimental",
       "new_risk": "red",
       "requires_admin": true,
@@ -1215,7 +1215,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
+      "new_status": "migrated",
       "new_id": "disable_power_perf",
       "new_preset": "experimental",
       "new_risk": "red",
@@ -1240,7 +1240,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
+      "new_status": "migrated",
       "new_id": "disable_laptop_ac",
       "new_preset": "experimental",
       "new_risk": "red",
@@ -1265,7 +1265,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
+      "new_status": "migrated",
       "new_id": "disable_laptop_bat",
       "new_preset": "experimental",
       "new_risk": "red",
@@ -1290,7 +1290,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
+      "new_status": "migrated",
       "new_id": "disable_gpu_preempt",
       "new_preset": "experimental",
       "new_risk": "red",
@@ -1315,7 +1315,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
+      "new_status": "migrated",
       "new_id": "disable_superfetch",
       "new_preset": "experimental",
       "new_risk": "red",
@@ -1340,7 +1340,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
+      "new_status": "migrated",
       "new_id": "disable_large_cache",
       "new_preset": "experimental",
       "new_risk": "red",
@@ -1365,8 +1365,8 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
-      "new_id": "disable_disable_mmcss",
+      "new_status": "migrated",
+      "new_id": "disable_mmcss",
       "new_preset": "experimental",
       "new_risk": "red",
       "requires_admin": true,
@@ -1390,7 +1390,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
+      "new_status": "migrated",
       "new_id": "disable_disk_no_sleep",
       "new_preset": "experimental",
       "new_risk": "red",
@@ -1415,8 +1415,8 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
-      "new_id": "disable_low_latency3",
+      "new_status": "migrated",
+      "new_id": "experimental_low_latency3",
       "new_preset": "experimental",
       "new_risk": "red",
       "requires_admin": true,
@@ -1465,7 +1465,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "privacy_disable_compat_tasks",
       "new_preset": "privacy",
       "new_risk": "red",
@@ -1515,7 +1515,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "disable_startup_delay",
       "new_preset": "safe",
       "new_risk": "green",
@@ -1590,7 +1590,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "disable_anim_disable",
       "new_preset": "safe",
       "new_risk": "green",
@@ -1640,8 +1640,8 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
-      "new_id": "disable_nic_nagle",
+      "new_status": "migrated",
+      "new_id": "experimental_nic_nagle",
       "new_preset": "experimental",
       "new_risk": "red",
       "requires_admin": true,
@@ -1665,8 +1665,8 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
-      "new_id": "disable_nic_lso_disable",
+      "new_status": "migrated",
+      "new_id": "experimental_nic_lso",
       "new_preset": "experimental",
       "new_risk": "red",
       "requires_admin": true,
@@ -1690,7 +1690,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "disable_disable_prefetch",
       "new_preset": "safe",
       "new_risk": "green",
@@ -1715,7 +1715,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "planned",
+      "new_status": "migrated",
       "new_id": "disable_disable_bg_tasks",
       "new_preset": "privacy",
       "new_risk": "green",
@@ -1740,7 +1740,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
+      "new_status": "migrated",
       "new_id": "disable_disable_mem_compress",
       "new_preset": "experimental",
       "new_risk": "red",
@@ -1765,7 +1765,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
+      "new_status": "migrated",
       "new_id": "experimental_timer_resolution_advisory",
       "new_preset": "experimental",
       "new_risk": "red",
@@ -1790,7 +1790,7 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
+      "new_status": "migrated",
       "new_id": "experimental_gpu_msi_advisory",
       "new_preset": "experimental",
       "new_risk": "red",
@@ -1815,8 +1815,8 @@
           "target": "legacy apply function requires review before implementation"
         }
       ],
-      "new_status": "experimental",
-      "new_id": "experimental_nic_rss_opt",
+      "new_status": "migrated",
+      "new_id": "experimental_nic_rss",
       "new_preset": "experimental",
       "new_risk": "red",
       "requires_admin": true,

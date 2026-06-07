@@ -38,6 +38,21 @@ def get_optimizations() -> list[Optimization]:
             ],
         ),
         Optimization(
+            id="disable_gamebar_tips",
+            title="禁用 Game Bar 提示和启动面板",
+            category="gaming",
+            preset="safe",
+            risk="green",
+            evidence="medium",
+            benefit=["关闭游戏栏快捷键提示和启动面板弹窗"],
+            side_effects=["Game Bar 控制器快捷键和提示不再显示"],
+            legacy_ids=[],
+            actions=[
+                RegistrySetAction("HKCU", r"SOFTWARE\Microsoft\GameBar", "UseNexusForGameBarEnabled", 0, "dword"),
+                RegistrySetAction("HKCU", r"SOFTWARE\Microsoft\GameBar", "ShowStartupPanel", 0, "dword"),
+            ],
+        ),
+        Optimization(
             id="force_fse",
             title="优化全屏独占模式行为",
             category="gaming",
@@ -84,7 +99,7 @@ def get_optimizations() -> list[Optimization]:
             side_effects=["可变刷新率优化关闭，可能影响显示器撕裂表现"],
             legacy_ids=["vrr"],
             actions=[
-                RegistrySetAction("HKCU", r"SOFTWARE\Microsoft\DirectX\UserGpuPreferences", "DirectXUserGlobalSettings", "VRROptimizeEnable=0;", "sz"),
+                RegistrySetAction("HKCU", r"SOFTWARE\Microsoft\DirectX\UserGpuPreferences", "DirectXUserGlobalSettings", "SwapEffectUpgradeEnable=1;VRROptimizeEnable=0;", "sz"),
             ],
             requires_admin=False,
         ),

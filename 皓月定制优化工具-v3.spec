@@ -25,7 +25,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='皓月定制优化工具-v2',
+    name='皓月定制优化工具-v3',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from haoyue_optimizer.core.advisory import AdvisoryAction
 from haoyue_optimizer.core.models import Optimization
 from haoyue_optimizer.core.power import PowerCfgSetAction
 from haoyue_optimizer.core.registry import RegistrySetAction
@@ -33,6 +32,16 @@ DISPLAY_OFF = "3c0bc021-c8a8-4e07-a973-6b14cbcb2b7e"
 BRIGHTNESS = "aded5e82-b909-4619-9949-f5d71dac0bcb"
 ADAPTIVE_BRIGHT = "fbd9aa66-9553-4097-ba44-ed6e9d65eab8"
 
+# Intel 异类调度 (P-core / E-core)
+CPU_HETERO_POLICY = "7f2f5cfa-f10c-4823-b5e1-e93ae85f46b5"
+CPU_HETERO_THREAD = "93b8b6dc-0698-4d1c-9ee4-0644e900c85d"
+CPU_HETERO_SHORT = "bae08b81-2d5e-4688-ad6a-13243356654b"
+CPU_CORE_OVERUTIL = "943c8cb6-6f93-4227-ad87-e9a3feec08d1"
+
+# 可切换动态显卡
+GPU_SWITCH_SUBGROUP = "e276e160-7cb0-43c6-b20b-73f5dce39954"
+GPU_SWITCH_GLOBAL = "a1662ab2-9d34-4e53-ba8b-2639b9e20857"
+
 
 def get_optimizations() -> list[Optimization]:
     return [
@@ -61,7 +70,6 @@ def get_optimizations() -> list[Optimization]:
             requires_admin=True,
             actions=[
                 PowerCfgSetAction(CPU_SUBGROUP, CPU_BOOST, ac=3, dc=3),
-                PowerCfgSetAction(CPU_SUBGROUP, CPU_MIN, ac=5, dc=5),
             ],
         ),
         Optimization(
@@ -87,9 +95,7 @@ def get_optimizations() -> list[Optimization]:
                 PowerCfgSetAction(DISPLAY_SUBGROUP, DISPLAY_OFF, ac=1800, dc=180),
                 PowerCfgSetAction(DISPLAY_SUBGROUP, BRIGHTNESS, ac=60, dc=60),
                 PowerCfgSetAction(DISPLAY_SUBGROUP, ADAPTIVE_BRIGHT, ac=0, dc=0),
-                PowerCfgSetAction(CPU_SUBGROUP, CPU_MIN, ac=5, dc=5, _action_id="power:gp:cpu_min"),
                 PowerCfgSetAction(CPU_SUBGROUP, CPU_MAX, ac=100, dc=100),
-                PowerCfgSetAction(CPU_SUBGROUP, CPU_BOOST, ac=3, dc=3, _action_id="power:gp:cpu_boost"),
             ],
         ),
         Optimization(
@@ -111,46 +117,29 @@ def get_optimizations() -> list[Optimization]:
         ),
         Optimization(
             id="disable_laptop_ac",
-            title="笔记本接电源时高性能方案",
+            title="接电源时 CPU 高性能参数",
             category="power",
             preset="aggressive",
             risk="red",
             evidence="low",
-            benefit=["接电源时自动切换到高性能电源方案"],
-            side_effects=["需要复制高性能电源方案并切换，可能影响电池寿命"],
+            benefit=[
+                "CPU 最小频率 100%、Boost Aggressive",
+                "异类调度全部设为性能优先，P 核阈值 85%",
+                "动态显卡切高性能，亮度 60%，禁用自适应亮度",
+            ],
+            side_effects=["CPU 始终高频运行，功耗和发热显著增加"],
             legacy_ids=["laptop_ac"],
             requires_admin=True,
             actions=[
-                AdvisoryAction(
-                    action_id="advisory:laptop_ac",
-                    target="powercfg scheme duplication",
-                    message=(
-                        "笔记本 AC 高性能方案需要复制电源方案并设置活动方案，"
-                        "本阶段只生成提示。"
-                    ),
-                ),
-            ],
-        ),
-        Optimization(
-            id="disable_laptop_bat",
-            title="笔记本电池模式平衡方案",
-            category="power",
-            preset="aggressive",
-            risk="red",
-            evidence="low",
-            benefit=["电池模式自动切换到平衡电源方案"],
-            side_effects=["切换到平衡电源方案，可能影响电池续航表现"],
-            legacy_ids=["laptop_bat"],
-            requires_admin=True,
-            actions=[
-                AdvisoryAction(
-                    action_id="advisory:laptop_bat",
-                    target="powercfg scheme switch",
-                    message=(
-                        "笔记本电池模式切换需要设置活动电源方案，"
-                        "本阶段只生成提示。"
-                    ),
-                ),
+                PowerCfgSetAction(CPU_SUBGROUP, CPU_MIN, ac=100, dc=100, _action_id="power:laptop_ac:cpu_min"),
+                PowerCfgSetAction(CPU_SUBGROUP, CPU_BOOST, ac=3, dc=3, _action_id="power:laptop_ac:cpu_boost"),
+                PowerCfgSetAction(CPU_SUBGROUP, CPU_HETERO_POLICY, ac=0, dc=0, _action_id="power:laptop_ac:hetero_policy"),
+                PowerCfgSetAction(CPU_SUBGROUP, CPU_HETERO_THREAD, ac=0, dc=0, _action_id="power:laptop_ac:hetero_thread"),
+                PowerCfgSetAction(CPU_SUBGROUP, CPU_HETERO_SHORT, ac=0, dc=0, _action_id="power:laptop_ac:hetero_short"),
+                PowerCfgSetAction(CPU_SUBGROUP, CPU_CORE_OVERUTIL, ac=85, dc=85, _action_id="power:laptop_ac:core_overutil"),
+                PowerCfgSetAction(GPU_SWITCH_SUBGROUP, GPU_SWITCH_GLOBAL, ac=2, dc=1, _action_id="power:laptop_ac:gpu_switch"),
+                PowerCfgSetAction(DISPLAY_SUBGROUP, BRIGHTNESS, ac=60, dc=60, _action_id="power:laptop_ac:brightness"),
+                PowerCfgSetAction(DISPLAY_SUBGROUP, ADAPTIVE_BRIGHT, ac=0, dc=0, _action_id="power:laptop_ac:adaptive_bright"),
             ],
         ),
         Optimization(

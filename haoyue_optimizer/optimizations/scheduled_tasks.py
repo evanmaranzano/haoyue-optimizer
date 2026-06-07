@@ -17,8 +17,6 @@ def get_optimizations() -> list[Optimization]:
             side_effects=["旧程序兼容性提示减少，部分诊断数据不再生成"],
             legacy_ids=["telemetry_full"],
             actions=[
-                ScheduledTaskSetEnabledAction(r"\Microsoft\Windows\Application Experience\ProgramDataUpdater", enabled=False),
-                ScheduledTaskSetEnabledAction(r"\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser", enabled=False),
                 ScheduledTaskSetEnabledAction(r"\Microsoft\Windows\Customer Experience Improvement Program\Consolidator", enabled=False),
             ],
         ),
