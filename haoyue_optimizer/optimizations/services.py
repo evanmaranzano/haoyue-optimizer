@@ -377,22 +377,6 @@ def get_optimizations() -> list[Optimization]:
             ],
         ),
         Optimization(
-            id="disable_appx_services",
-            title="禁用 AppX 部署和商店相关服务",
-            category="services",
-            preset="aggressive",
-            risk="yellow",
-            evidence="medium",
-            benefit=["停止 AppX Deployment/Store 安装/许可证管理后台服务"],
-            side_effects=["Microsoft Store 安装更新不可用，UWP 应用部署受限"],
-            legacy_ids=[],
-            actions=[
-                ServiceStartTypeAction("AppXSvc", "disabled", stop=True),
-                ServiceStartTypeAction("ClipSVC", "disabled", stop=True),
-                ServiceStartTypeAction("InstallService", "disabled", stop=True),
-            ],
-        ),
-        Optimization(
             id="disable_update_orchestrator",
             title="禁用 Windows Update 编排服务",
             category="services",

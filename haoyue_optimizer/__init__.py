@@ -1,4 +1,4 @@
-VERSION = "3.3.0"
+VERSION = "3.3.1"
 
 PRESETS = {
     "safe": "安全模式：仅低风险、可直接恢复的优化项",
