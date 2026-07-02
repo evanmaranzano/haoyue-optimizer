@@ -32,13 +32,14 @@ DISPLAY_OFF = "3c0bc021-c8a8-4e07-a973-6b14cbcb2b7e"
 BRIGHTNESS = "aded5e82-b909-4619-9949-f5d71dac0bcb"
 ADAPTIVE_BRIGHT = "fbd9aa66-9553-4097-ba44-ed6e9d65eab8"
 
-# Intel 异类调度 (P-core / E-core)
+# Intel P-core / E-core heterogeneous scheduling GUIDs.
+# These have no effect on AMD monolithic or older Intel non-hybrid CPUs.
 CPU_HETERO_POLICY = "7f2f5cfa-f10c-4823-b5e1-e93ae85f46b5"
 CPU_HETERO_THREAD = "93b8b6dc-0698-4d1c-9ee4-0644e900c85d"
 CPU_HETERO_SHORT = "bae08b81-2d5e-4688-ad6a-13243356654b"
 CPU_CORE_OVERUTIL = "943c8cb6-6f93-4227-ad87-e9a3feec08d1"
 
-# 可切换动态显卡
+# Switchable dynamic GPU
 GPU_SWITCH_SUBGROUP = "e276e160-7cb0-43c6-b20b-73f5dce39954"
 GPU_SWITCH_GLOBAL = "a1662ab2-9d34-4e53-ba8b-2639b9e20857"
 
@@ -64,8 +65,8 @@ def get_optimizations() -> list[Optimization]:
             preset="aggressive",
             risk="red",
             evidence="low",
-            benefit=["CPU Boost 设为 Aggressive，最小处理器状态设为 5%"],
-            side_effects=["CPU Boost 设为 Aggressive，最小处理器状态设为 5%，可能增加功耗和发热"],
+            benefit=["CPU Boost 设为 Efficient Aggressive (3)，激进加力"],
+            side_effects=["CPU Boost 设为 Efficient Aggressive，可能增加功耗和发热"],
             legacy_ids=["gaming_boost"],
             requires_admin=True,
             actions=[
@@ -94,7 +95,7 @@ def get_optimizations() -> list[Optimization]:
                 PowerCfgSetAction(ASPM_SUBGROUP, ASPM_SETTING, ac=0, dc=0),
                 PowerCfgSetAction(WIFI_SUBGROUP, WIFI_POWER, ac=0, dc=2),
                 PowerCfgSetAction(DISPLAY_SUBGROUP, DISPLAY_OFF, ac=1800, dc=180),
-                PowerCfgSetAction(DISPLAY_SUBGROUP, BRIGHTNESS, ac=60, dc=60),
+                # BRIGHTNESS excluded — user preference, see compat
                 PowerCfgSetAction(DISPLAY_SUBGROUP, ADAPTIVE_BRIGHT, ac=0, dc=0),
                 PowerCfgSetAction(CPU_SUBGROUP, CPU_MAX, ac=100, dc=100),
             ],
@@ -116,32 +117,55 @@ def get_optimizations() -> list[Optimization]:
                 RegistrySetAction("HKLM", r"SYSTEM\CurrentControlSet\Control\Session Manager\Power", "HiberbootEnabled", 0, "dword"),
             ],
         ),
+        # ── disable_laptop_ac: 仅笔记本通用电源设置，不含 Intel 异构调度 ──
         Optimization(
             id="disable_laptop_ac",
-            title="接电源时 CPU 高性能参数",
+            title="笔记本接电源时 CPU 高性能参数",
             category="power",
             preset="aggressive",
             risk="red",
             evidence="low",
             benefit=[
-                "CPU 最小频率 100%、Boost Aggressive",
-                "异类调度全部设为性能优先，P 核阈值 85%",
-                "动态显卡切高性能，亮度 60%，禁用自适应亮度",
+                "CPU 最小频率 5%（AC）以允许空闲降频",
+                "CPU Boost = Efficient Aggressive",
+                "动态显卡 AC 切高性能",
+                "禁用自适应亮度",
             ],
-            side_effects=["CPU 始终高频运行，功耗和发热显著增加"],
+            side_effects=["CPU Boost 提升后发热和功耗增加"],
             legacy_ids=["laptop_ac"],
             requires_admin=True,
             actions=[
                 PowerCfgSetActiveAction(_action_id="power:laptop_ac:set_balanced"),
-                PowerCfgSetAction(CPU_SUBGROUP, CPU_MIN, ac=100, dc=100, _action_id="power:laptop_ac:cpu_min"),
+                # AC 低限 5%（允许降压降频），DC 保留系统默认（由电池策略控制）
+                PowerCfgSetAction(CPU_SUBGROUP, CPU_MIN, ac=5, dc=5, _action_id="power:laptop_ac:cpu_min"),
                 PowerCfgSetAction(CPU_SUBGROUP, CPU_BOOST, ac=3, dc=3, _action_id="power:laptop_ac:cpu_boost"),
-                PowerCfgSetAction(CPU_SUBGROUP, CPU_HETERO_POLICY, ac=0, dc=0, _action_id="power:laptop_ac:hetero_policy"),
-                PowerCfgSetAction(CPU_SUBGROUP, CPU_HETERO_THREAD, ac=0, dc=0, _action_id="power:laptop_ac:hetero_thread"),
-                PowerCfgSetAction(CPU_SUBGROUP, CPU_HETERO_SHORT, ac=0, dc=0, _action_id="power:laptop_ac:hetero_short"),
-                PowerCfgSetAction(CPU_SUBGROUP, CPU_CORE_OVERUTIL, ac=85, dc=85, _action_id="power:laptop_ac:core_overutil"),
                 PowerCfgSetAction(GPU_SWITCH_SUBGROUP, GPU_SWITCH_GLOBAL, ac=2, dc=1, _action_id="power:laptop_ac:gpu_switch"),
-                PowerCfgSetAction(DISPLAY_SUBGROUP, BRIGHTNESS, ac=60, dc=60, _action_id="power:laptop_ac:brightness"),
                 PowerCfgSetAction(DISPLAY_SUBGROUP, ADAPTIVE_BRIGHT, ac=0, dc=0, _action_id="power:laptop_ac:adaptive_bright"),
+            ],
+        ),
+        # ── Intel 异构调度专用版 ──
+        Optimization(
+            id="disable_laptop_ac_intel_hybrid",
+            title="笔记本接电源时 Intel 异构调度优化",
+            category="power",
+            preset="aggressive",
+            risk="red",
+            evidence="low",
+            benefit=[
+                "Intel P-core/E-core 异类调度全部设为性能优先",
+                "P 核阈值 85%",
+                "与 disable_laptop_ac 配合使用",
+            ],
+            side_effects=["仅 Intel 混合架构 CPU 有效，AMD 平台自动跳过"],
+            legacy_ids=[],
+            applicability=["intel_hybrid_only"],
+            requires_admin=True,
+            actions=[
+                PowerCfgSetActiveAction(_action_id="power:intel_hybrid:set_balanced"),
+                PowerCfgSetAction(CPU_SUBGROUP, CPU_HETERO_POLICY, ac=0, dc=0, _action_id="power:intel_hybrid:hetero_policy"),
+                PowerCfgSetAction(CPU_SUBGROUP, CPU_HETERO_THREAD, ac=0, dc=0, _action_id="power:intel_hybrid:hetero_thread"),
+                PowerCfgSetAction(CPU_SUBGROUP, CPU_HETERO_SHORT, ac=0, dc=0, _action_id="power:intel_hybrid:hetero_short"),
+                PowerCfgSetAction(CPU_SUBGROUP, CPU_CORE_OVERUTIL, ac=85, dc=85, _action_id="power:intel_hybrid:core_overutil"),
             ],
         ),
         Optimization(
@@ -163,16 +187,18 @@ def get_optimizations() -> list[Optimization]:
                 RegistrySetAction("HKLM", r"SYSTEM\CurrentControlSet\Control\Power\PDC\Activators\Default\VetoPolicy", "EA:EnergySaverEngaged", 0, "dword"),
             ],
         ),
+        # ── Intel Core Overutilization Threshold 解锁（仅 Intel hybrid） ──
         Optimization(
             id="disable_unlock_ppm",
-            title="解锁处理器电源管理",
+            title="解锁处理器电源管理隐藏选项",
             category="power",
             preset="aggressive",
             risk="red",
             evidence="low",
-            benefit=["解锁处理器电源管理隐藏选项"],
-            side_effects=["解锁后可能被误改导致电源管理异常"],
+            benefit=["解锁 Intel 处理器异构核心过载阈值隐藏选项"],
+            side_effects=["仅 Intel 混合架构有效，AMD 平台自动跳过"],
             legacy_ids=["unlock_ppm"],
+            applicability=["intel_hybrid_only"],
             requires_admin=True,
             actions=[
                 RegistrySetAction(

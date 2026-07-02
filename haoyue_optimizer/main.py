@@ -11,6 +11,8 @@ from haoyue_optimizer.core.backup import latest_backup, read_backup
 from haoyue_optimizer.core.executor import apply_plan, rollback_backup
 from haoyue_optimizer.core.planner import build_plan
 from haoyue_optimizer.core.report import export_report
+from haoyue_optimizer.core.service import repair_store_safe_services
+from haoyue_optimizer.core.compat import STORE_SAFE_PROTECTED_SERVICES
 from haoyue_optimizer.core.validation import PlanValidationError, validate_plan_for_apply
 
 GREEN = "\033[92m"
@@ -51,6 +53,9 @@ def main(argv: list[str] | None = None) -> int:
     report_parser = sub.add_parser("export-report", help="从 plan 和 backup 导出报告")
     report_parser.add_argument("--plan", required=True)
     report_parser.add_argument("--backup", required=True)
+
+    repair_parser = sub.add_parser("repair-store-safe", help="修复被禁用 Store-safe 服务为推荐启动类型")
+    repair_parser.add_argument("--yes", action="store_true", help="跳过确认")
 
     args = parser.parse_args(argv)
 
@@ -113,6 +118,32 @@ def main(argv: list[str] | None = None) -> int:
         plan = json.loads(Path(args.plan).read_text(encoding="utf-8"))
         backup = json.loads(Path(args.backup).read_text(encoding="utf-8"))
         print(export_report(plan, backup))
+        return 0
+
+    if args.command == "repair-store-safe":
+        if not is_admin():
+            print("repair-store-safe 需要管理员权限，请用管理员 PowerShell 重新运行。", file=sys.stderr)
+            return 3
+        if not args.yes:
+            print(f"  即将检查 {len(STORE_SAFE_PROTECTED_SERVICES)} 个受保护服务")
+            print("  修复规则: 仅将 Disabled → 推荐启动类型，不动其他状态\n")
+            confirm = input(f"  输入 {RED}REPAIR{RESET} 确认: ").strip()
+            if confirm != "REPAIR":
+                print(f"  {YELLOW}已取消{RESET}", file=sys.stderr)
+                return 4
+        repairs = repair_store_safe_services()
+        fixed = [r for r in repairs if r["status"] == "repaired"]
+        failed = [r for r in repairs if r["status"] == "failed"]
+        if fixed:
+            print(f"\n  {GREEN}已修复 {len(fixed)} 个服务:{RESET}")
+            for r in fixed:
+                print(f"    {r['service']}: Disabled → {r['after']}")
+        if failed:
+            print(f"\n  {RED}修复失败 {len(failed)} 个:{RESET}")
+            for r in failed:
+                print(f"    {r['service']}: {r.get('detail', 'unknown error')}")
+        if not fixed and not failed:
+            print(f"  {GREEN}无需修复，所有受保护服务状态正常{RESET}")
         return 0
 
     return 1

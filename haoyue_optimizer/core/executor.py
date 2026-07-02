@@ -128,6 +128,13 @@ def _combine_statuses(statuses: list[str]) -> str:
     unique = set(statuses)
     if len(unique) == 1:
         return statuses[0]
+    # All blocked → blocked
+    if unique <= {"blocked"}:
+        return "blocked"
+    # All skipped → skipped
+    if unique <= {"skipped"}:
+        return "skipped"
+    # mixed: failed overrides others
     if "failed" in unique:
         return "partial"
     if "pending_reboot" in unique:

@@ -86,21 +86,35 @@ def get_optimizations() -> list[Optimization]:
                 RegistrySetAction("HKLM", r"SYSTEM\CurrentControlSet\Services\Disk", "TimeOutValue", 0, "dword"),
             ],
         ),
+        # ── IRQ affinity: advisory-only on modern systems ──
+        # Most modern GPUs use MSI/MSI-X, so fixed IRQ affinity (IRQ8/IRQ16)
+        # has no effect.  This optimization is retained as advisory so users can
+        # check their device interrupt mode before applying manual tuning.
         Optimization(
             id="experimental_irq_affinity",
-            title="IRQ 中断亲和性优化",
+            title="IRQ 中断亲和性检测（仅报告）",
             category="system",
             preset="aggressive",
             risk="red",
             evidence="low",
-            benefit=["为 RTC 和 GPU 中断分配独立 CPU 核心，减少 DPC 排队争用"],
-            side_effects=["中断亲和性硬编码，核心数变化或硬件更换后需重新配置"],
+            benefit=["检测 GPU 和音频设备使用的中断模式，如为 line-based IRQ 则提示优化方案"],
+            side_effects=[
+                "仅检测和报告，不自动写入 PriorityControl",
+                "现代 GPU（MSI/MSI-X 模式）不受 IRQ 优先级影响",
+            ],
             legacy_ids=[],
             requires_admin=True,
-            requires_reboot=True,
+            requires_reboot=False,
             actions=[
-                RegistrySetAction("HKLM", r"SYSTEM\CurrentControlSet\Control\PriorityControl", "IRQ8Priority", 1, "dword"),
-                RegistrySetAction("HKLM", r"SYSTEM\CurrentControlSet\Control\PriorityControl", "IRQ16Priority", 2, "dword"),
+                AdvisoryAction(
+                    action_id="advisory:irq_affinity",
+                    target="GPU interrupt mode detection",
+                    message=(
+                        "检查设备管理器 → GPU → 资源 → IRQ。"
+                        "如果 GPU 使用 MSI 模式（负 IRQ 编号如 -2/-5），无需配置 IRQ 优先级。"
+                        "如果使用正数 IRQ（line-based），可手动调整 PriorityControl。"
+                    ),
+                ),
             ],
         ),
         Optimization(
@@ -110,7 +124,7 @@ def get_optimizations() -> list[Optimization]:
             preset="aggressive",
             risk="red",
             evidence="low",
-            benefit=["固定时钟中断频率，减少帧时间抖动，Intel 平台效果更明显"],
+            benefit=["固定时钟中断频率，减少帧时间抖动"],
             side_effects=["笔记本功耗增加，需重启生效"],
             legacy_ids=[],
             requires_admin=True,

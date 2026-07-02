@@ -91,6 +91,11 @@ def get_optimizations() -> list[Optimization]:
                 RegistrySetAction("HKLM", r"SYSTEM\CurrentControlSet\Control\FileSystem", "NtfsDisable8dot3NameCreation", 1, "dword"),
             ],
         ),
+        # ── NTFS last-access: 0x80000002 and 0x80000003 are both disabled ──
+        # Windows encodes the "system managed + disabled" state as 0x80000002
+        # and the "user disabled" state as 0x80000003.  Both mean "last access
+        # time updates are off".  The optimizer targets 0x80000003 (user
+        # explicitly disabled) but treats 0x80000002 as equivalent.
         Optimization(
             id="disable_last_access_update",
             title="禁用 NTFS 最后访问时间更新",

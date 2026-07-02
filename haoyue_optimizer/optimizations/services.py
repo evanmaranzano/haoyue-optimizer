@@ -179,20 +179,6 @@ def get_optimizations() -> list[Optimization]:
                 ServiceStartTypeAction("WSearch", "disabled", stop=True),
             ],
         ),
-        Optimization(
-            id="eventlog_demand_start",
-            title="Windows Event Log 改为按需启动",
-            category="services",
-            preset="aggressive",
-            risk="yellow",
-            evidence="low",
-            benefit=["减少后台事件日志的磁盘写入 I/O"],
-            side_effects=["事件日志不再常驻运行，部分依赖实时日志的功能可能受影响"],
-            legacy_ids=[],
-            actions=[
-                ServiceStartTypeAction("EventLog", "manual"),
-            ],
-        ),
         # ── 批量禁用安全且高频无用的系统服务 ──
         Optimization(
             id="disable_geolocation",
@@ -300,16 +286,21 @@ def get_optimizations() -> list[Optimization]:
                 ServiceStartTypeAction("SEMgrSvc", "disabled", stop=True),
             ],
         ),
+        # ── Print Spooler: 仅在不需打印的场景可选，aggressive 也不默认执行 ──
         Optimization(
             id="disable_print_services",
             title="禁用打印和传真相关服务",
             category="services",
-            preset="safe",
-            risk="green",
+            preset="aggressive",
+            risk="yellow",
             evidence="medium",
             benefit=["停止 Print Spooler/PrintNotify/Fax 后台资源占用"],
-            side_effects=["本地和网络打印机不可用"],
+            side_effects=[
+                "本地和网络打印机不可用，PDF/虚拟打印机不可用",
+                "该优化在 safe 和普通 aggressive 场景不自动执行，仅 no-printer 场景可选",
+            ],
             legacy_ids=[],
+            applicability=["no_printer", "kiosk", "server_no_print"],
             actions=[
                 ServiceStartTypeAction("Spooler", "disabled", stop=True),
                 ServiceStartTypeAction("PrintNotify", "disabled", stop=True),
@@ -377,22 +368,6 @@ def get_optimizations() -> list[Optimization]:
             ],
         ),
         Optimization(
-            id="disable_update_orchestrator",
-            title="禁用 Windows Update 编排服务",
-            category="services",
-            preset="aggressive",
-            risk="yellow",
-            evidence="medium",
-            benefit=["停止更新编排和 Medic 服务，阻止后台自动更新调度"],
-            side_effects=["Windows Update 自动调度不可用，需手动检查更新"],
-            legacy_ids=[],
-            actions=[
-                ServiceStartTypeAction("UsoSvc", "disabled", stop=True),
-                ServiceStartTypeAction("wuauserv", "disabled", stop=True),
-                ServiceStartTypeAction("WaaSMedicSvc", "disabled", stop=True),
-            ],
-        ),
-        Optimization(
             id="disable_windows_insider",
             title="禁用 Windows Insider 服务",
             category="services",
@@ -404,20 +379,6 @@ def get_optimizations() -> list[Optimization]:
             legacy_ids=[],
             actions=[
                 ServiceStartTypeAction("wisvc", "disabled", stop=True),
-            ],
-        ),
-        Optimization(
-            id="disable_threat_intel",
-            title="禁用威胁情报和安全中心推送",
-            category="services",
-            preset="aggressive",
-            risk="yellow",
-            evidence="medium",
-            benefit=["停止威胁情报收集和安全中心通知推送"],
-            side_effects=["安全中心通知和威胁情报不可用"],
-            legacy_ids=[],
-            actions=[
-                ServiceStartTypeAction("wscsvc", "disabled", stop=True),
             ],
         ),
         Optimization(

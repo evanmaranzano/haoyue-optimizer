@@ -11,7 +11,7 @@ from tempfile import TemporaryDirectory
 ROOT = Path(__file__).resolve().parent.parent
 
 from haoyue_optimizer.core.executor import apply_plan, rollback_backup
-from haoyue_optimizer.core.planner import build_plan
+from haoyue_optimizer.core.planner import build_plan, reset_hw_cache
 from haoyue_optimizer.core.power import FakePowerBackend, PowerCfgSetAction
 from haoyue_optimizer.core.registry import FakeRegistryBackend, RegistrySetAction
 from haoyue_optimizer.core.advisory import AdvisoryAction
@@ -19,6 +19,10 @@ from haoyue_optimizer.core.report import export_report
 from haoyue_optimizer.core.scheduled_task import FakeScheduledTaskBackend, ScheduledTaskSetEnabledAction
 from haoyue_optimizer.core.service import FakeServiceBackend, ServiceStartTypeAction
 from haoyue_optimizer.optimizations.catalog import get_optimizations
+
+# Hardware context for tests that use fake backends — prevents real
+# hardware detection (PowerShell/WMI) from being invoked during tests.
+_FAKE_HW = {"is_intel_hybrid": False, "is_amd": False, "is_laptop": False}
 
 
 class RegistryActionTests(unittest.TestCase):
@@ -141,7 +145,7 @@ class CatalogPlanTests(unittest.TestCase):
             self.assertIn(item.preset, {"safe", "aggressive"})
 
     def test_plan_includes_legacy_ids_and_applicability(self):
-        plan = build_plan("safe", registry_backend=FakeRegistryBackend(), service_backend=FakeServiceBackend())
+        plan = build_plan("safe", registry_backend=FakeRegistryBackend(), service_backend=FakeServiceBackend(), hw_context=_FAKE_HW)
         self.assertTrue(plan["items"])
         for item in plan["items"]:
             self.assertIn("legacy_ids", item)
@@ -169,7 +173,7 @@ class CatalogPlanTests(unittest.TestCase):
         power.set_value("scheme-a", "2a737441-1930-4402-8d77-b2bebba308a3", "48e6b7a6-50f5-4782-a5d4-53bb8f07e226", ac=1, dc=1)
 
         for preset in ("safe", "aggressive"):
-            plan = build_plan(preset, registry_backend=registry, service_backend=services, task_backend=tasks, power_backend=power)
+            plan = build_plan(preset, registry_backend=registry, service_backend=services, task_backend=tasks, power_backend=power, hw_context=_FAKE_HW)
             self.assertEqual(plan["preset"], preset)
             self.assertTrue(plan["items"], preset)
             for item in plan["items"]:
@@ -197,8 +201,8 @@ class ExecutorTests(unittest.TestCase):
         services.add_service("MMCMS", start_type="auto", running=True)
         power.set_value("scheme-a", "2a737441-1930-4402-8d77-b2bebba308a3", "48e6b7a6-50f5-4782-a5d4-53bb8f07e226", ac=1, dc=1)
 
-        safe_plan = build_plan("safe", registry_backend=registry, service_backend=services, task_backend=tasks, power_backend=power)
-        aggressive_plan = build_plan("aggressive", registry_backend=registry, service_backend=services, task_backend=tasks, power_backend=power)
+        safe_plan = build_plan("safe", registry_backend=registry, service_backend=services, task_backend=tasks, power_backend=power, hw_context=_FAKE_HW)
+        aggressive_plan = build_plan("aggressive", registry_backend=registry, service_backend=services, task_backend=tasks, power_backend=power, hw_context=_FAKE_HW)
         combined = {**safe_plan, "preset": "combined", "items": safe_plan["items"] + aggressive_plan["items"]}
 
         backup = apply_plan(combined, registry_backend=registry, service_backend=services, task_backend=tasks, power_backend=power, write_file=False)
