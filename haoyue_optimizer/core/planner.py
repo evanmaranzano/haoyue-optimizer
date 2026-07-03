@@ -4,11 +4,17 @@ from datetime import datetime
 from typing import Any
 
 from haoyue_optimizer import VERSION
-from haoyue_optimizer.core.compat import is_intel_hybrid_cpu, is_amd_cpu, is_laptop
+from haoyue_optimizer.core.compat import (
+    STORE_SAFE_DEFAULT_START_TYPES,
+    is_amd_cpu,
+    is_intel_hybrid_cpu,
+    is_laptop,
+    is_service_disabled,
+)
 from haoyue_optimizer.core.power import WindowsPowerBackend
 from haoyue_optimizer.core.registry import WindowsRegistryBackend
 from haoyue_optimizer.core.scheduled_task import WindowsScheduledTaskBackend
-from haoyue_optimizer.core.service import WindowsServiceBackend
+from haoyue_optimizer.core.service import ServiceStartTypeAction, WindowsServiceBackend
 from haoyue_optimizer.optimizations.catalog import get_optimizations
 
 # ── Hardware context cache (populated once per process lifetime) ──
@@ -36,10 +42,14 @@ def reset_hw_cache() -> None:
 
 # ── Explicit opt-in profiles ──
 
-_EXPLICIT_OPT_IN_TAGS = {"no_printer", "kiosk", "server_no_print", "extreme_only"}
+EXPLICIT_PROFILES = frozenset({"no_printer", "kiosk", "server_no_print", "extreme_only"})
 
 
-def _applies_to_current_system(applicability: list[str]) -> bool:
+def _applies_to_current_system(
+    applicability: list[str],
+    enabled_profiles: set[str] | frozenset[str] | None = None,
+    hw_context: dict | None = None,
+) -> bool:
     """Return True when all applicability constraints match the current hardware.
 
     Supported tags:
@@ -50,10 +60,10 @@ def _applies_to_current_system(applicability: list[str]) -> bool:
       - no_printer / kiosk / server_no_print / extreme_only
                             → never auto-apply (explicit opt-in)
     """
-    hw = _ensure_hw()
+    hw = hw_context if hw_context is not None else _ensure_hw()
 
-    # Explicit opt-in profiles — never auto-apply
-    if any(tag in _EXPLICIT_OPT_IN_TAGS for tag in applicability):
+    explicit_tags = set(applicability) & EXPLICIT_PROFILES
+    if explicit_tags and not explicit_tags.intersection(enabled_profiles or set()):
         return False
 
     if "intel_hybrid_only" in applicability and not hw["is_intel_hybrid"]:
@@ -74,8 +84,10 @@ def build_plan(
     service_backend=None,
     task_backend=None,
     power_backend=None,
+    subprocess_backend=None,
     *,
     hw_context: dict | None = None,
+    enabled_profiles: set[str] | frozenset[str] | None = None,
 ) -> dict[str, Any]:
     """Build a plan of optimizations for the given preset.
 
@@ -86,10 +98,6 @@ def build_plan(
         ``is_intel_hybrid`` (bool), ``is_amd`` (bool), ``is_laptop`` (bool).
         When omitted, real hardware detection is performed on first call.
     """
-    global _hw
-    if hw_context is not None:
-        _hw = hw_context
-
     registry_backend = registry_backend or WindowsRegistryBackend()
     service_backend = service_backend or WindowsServiceBackend()
     task_backend = task_backend or WindowsScheduledTaskBackend()
@@ -105,12 +113,23 @@ def build_plan(
             continue
 
         # Hardware applicability filtering
-        if not _applies_to_current_system(optimization.applicability):
+        if not _applies_to_current_system(
+            optimization.applicability,
+            enabled_profiles,
+            hw_context,
+        ):
             continue
 
         actions = []
         for action in optimization.actions:
-            backend = _backend_for(action.action_type, registry_backend, service_backend, task_backend, power_backend)
+            backend = _backend_for(
+                action.action_type,
+                registry_backend,
+                service_backend,
+                task_backend,
+                power_backend,
+                subprocess_backend,
+            )
             actions.append({
                 "action_id": action.action_id,
                 "type": action.action_type,
@@ -143,7 +162,58 @@ def build_plan(
     }
 
 
-def _backend_for(action_type: str, registry_backend, service_backend, task_backend, power_backend):
+def build_store_safe_repair_plan(
+    service_backend=None,
+) -> tuple[dict[str, Any], dict[str, ServiceStartTypeAction]]:
+    service_backend = service_backend or WindowsServiceBackend()
+    items = []
+    actions_by_id: dict[str, ServiceStartTypeAction] = {}
+
+    for service_name, start_type in sorted(STORE_SAFE_DEFAULT_START_TYPES.items()):
+        action = ServiceStartTypeAction(service_name, start_type, only_if_disabled=True)
+        current = action.current(service_backend)
+        if not current.get("exists") or not is_service_disabled(current.get("start_type")):
+            continue
+        actions_by_id[action.action_id] = action
+        items.append({
+            "id": f"repair_store_safe_{service_name.casefold()}",
+            "title": f"恢复受保护服务 {service_name}",
+            "category": "services",
+            "preset": "repair-store-safe",
+            "risk": "green",
+            "evidence": "high",
+            "benefit": ["恢复 Microsoft Store、Windows Update 或系统可靠性所需服务"],
+            "side_effects": [f"{service_name} 将从 Disabled 恢复为 {start_type}"],
+            "legacy_ids": [],
+            "requires_admin": True,
+            "requires_reboot": False,
+            "applicability": ["Windows 10/11"],
+            "actions": [{
+                "action_id": action.action_id,
+                "type": action.action_type,
+                "target": action.target,
+                "current": current,
+                "desired": action.desired(),
+            }],
+        })
+
+    return {
+        "version": "2.0.0",
+        "tool_version": VERSION,
+        "created_at": datetime.now().isoformat(timespec="seconds"),
+        "preset": "repair-store-safe",
+        "items": items,
+    }, actions_by_id
+
+
+def _backend_for(
+    action_type: str,
+    registry_backend,
+    service_backend,
+    task_backend,
+    power_backend,
+    subprocess_backend,
+):
     if action_type == "registry_set":
         return registry_backend
     if action_type == "service_start_type":
@@ -157,5 +227,5 @@ def _backend_for(action_type: str, registry_backend, service_backend, task_backe
     if action_type == "file_cleanup":
         return None
     if action_type == "subprocess":
-        return None
+        return subprocess_backend
     raise ValueError(f"unsupported action type: {action_type}")

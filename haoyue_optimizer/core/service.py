@@ -12,14 +12,12 @@ from haoyue_optimizer.core.compat import (
 
 _START_TO_REG = {"boot": 0, "system": 1, "auto": 2, "manual": 3, "disabled": 4}
 _REG_TO_START = {value: key for key, value in _START_TO_REG.items()}
+_STORE_SAFE_PROTECTED_SERVICE_KEYS = {name.casefold() for name in STORE_SAFE_PROTECTED_SERVICES}
+_OPTIONAL_SERVICE_KEYS = {name.casefold() for name in OPTIONAL_SERVICES_MAY_NOT_EXIST}
 
 
 class ServiceNotModifiable(Exception):
     """Raised when a service cannot be modified (e.g. wscsvc with Tamper Protection)."""
-
-
-class StoreSafeBlocked(Exception):
-    """Raised when an operation is blocked by the Store-safe guard."""
 
 
 class FakeServiceBackend:
@@ -96,10 +94,7 @@ class ServiceStartTypeAction:
     name: str
     start_type: str
     stop: bool = False
-
-    # ── skip / block result markers (set by apply) ──
-    _skip_reason: str | None = None
-    _block_reason: str | None = None
+    only_if_disabled: bool = False
 
     @property
     def action_id(self) -> str:
@@ -116,13 +111,8 @@ class ServiceStartTypeAction:
     # ── guard helpers ──
 
     @staticmethod
-    def _service_exists(name: str, backend) -> bool:
-        current = backend.get(name)
-        return current is not None and current.get("exists", False) is True
-
-    @staticmethod
     def _is_store_safe_protected(name: str) -> bool:
-        return name.strip() in STORE_SAFE_PROTECTED_SERVICES
+        return name.strip().casefold() in _STORE_SAFE_PROTECTED_SERVICE_KEYS
 
     @staticmethod
     def _is_forbidden_action(start_type: str, stop: bool) -> bool:
@@ -134,10 +124,9 @@ class ServiceStartTypeAction:
         return False
 
     @staticmethod
-    def _skip_missing(name: str) -> str | None:
-        """Return a skip reason when a service is missing and should be skipped
-        silently.  Return None when the service is expected to exist."""
-        if name in OPTIONAL_SERVICES_MAY_NOT_EXIST:
+    def _skip_missing(name: str) -> str:
+        """Return the reason for skipping a missing service."""
+        if name.casefold() in _OPTIONAL_SERVICE_KEYS:
             return "optional_service_not_present"
         return "service_not_present"
 
@@ -167,6 +156,16 @@ class ServiceStartTypeAction:
                 "verify": {"status": "skipped", "detail": f"{skip_reason}:{self.name}"},
             }
 
+        if self.only_if_disabled and not is_service_disabled(before.get("start_type")):
+            return {
+                "action_id": self.action_id,
+                "action_type": self.action_type,
+                "target": self.target,
+                "before": before,
+                "after": None,
+                "verify": {"status": "skipped", "detail": f"service_not_disabled:{self.name}"},
+            }
+
         # 2. Store-safe protection → block
         if self._is_store_safe_protected(self.name) and self._is_forbidden_action(self.start_type, self.stop):
             return {
@@ -179,19 +178,9 @@ class ServiceStartTypeAction:
             }
 
         # 3. Proceed normally
-        try:
-            if self.stop:
-                backend.stop(self.name)
-            backend.set_start_type(self.name, self.start_type)
-        except StoreSafeBlocked:
-            return {
-                "action_id": self.action_id,
-                "action_type": self.action_type,
-                "target": self.target,
-                "before": before,
-                "after": None,
-                "verify": {"status": "blocked", "detail": f"store_safe_protected:{self.name}"},
-            }
+        if self.stop:
+            backend.stop(self.name)
+        backend.set_start_type(self.name, self.start_type)
 
         after = self.current(backend)
         return {
@@ -208,10 +197,8 @@ class ServiceStartTypeAction:
             return {"status": "skipped", "current": current, "expected": self.desired(),
                     "detail": "service_not_present"}
         passed = current.get("start_type") == self.start_type
-        if self.stop and not passed:
+        if self.stop and current.get("running"):
             passed = False
-        elif self.stop and passed and current.get("running"):
-            pass
         return {"status": "passed" if passed else "failed", "current": current, "expected": self.desired()}
 
     def rollback(self, backend, before: dict[str, Any]) -> None:
@@ -222,44 +209,3 @@ class ServiceStartTypeAction:
             backend.start(self.name)
         else:
             backend.stop(self.name)
-
-
-# ── Repair / utility functions ──
-
-
-def repair_store_safe_services(backend=None) -> list[dict[str, Any]]:
-    """Restore any store-safe services that are currently Disabled to their
-    recommended start types.  Only restores Disabled → recommended; never
-    forces a running service to stop.
-
-    Returns a list of repair records: {service, before, after, status}.
-    """
-    from haoyue_optimizer.core.compat import STORE_SAFE_DEFAULT_START_TYPES
-
-    backend = backend or WindowsServiceBackend()
-    repairs: list[dict[str, Any]] = []
-
-    for svc, desired_start in sorted(STORE_SAFE_DEFAULT_START_TYPES.items()):
-        current = backend.get(svc)
-        if current is None or not current.get("exists"):
-            continue
-        current_start = current.get("start_type")
-        if current_start == "disabled":
-            try:
-                backend.set_start_type(svc, desired_start)
-                repairs.append({
-                    "service": svc,
-                    "before": "disabled",
-                    "after": desired_start,
-                    "status": "repaired",
-                })
-            except (ServiceNotModifiable, StoreSafeBlocked, OSError) as exc:
-                repairs.append({
-                    "service": svc,
-                    "before": "disabled",
-                    "after": desired_start,
-                    "status": "failed",
-                    "detail": str(exc),
-                })
-
-    return repairs

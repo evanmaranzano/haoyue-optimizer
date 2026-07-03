@@ -3,11 +3,11 @@
 Windows 系统/游戏/隐私优化 CLI，模块化架构，支持：
 
 - `scan → plan → apply → verify → rollback → report`
-- 101 个 catalog 优化项 / 282 个 actions
+- 147 个 catalog 优化项 / 374 个 actions
 - 73 个旧版 legacy 项完整迁移矩阵
 - safe / aggressive 两档预设（aggressive 包含全部 safe）
 - 动作级 backup 和 rollback
-- 高风险项默认拦截，需 `--allow-experimental` 显式启用
+- `no_printer` / `kiosk` / `server_no_print` / `extreme_only` 场景必须通过 `--profile` 显式启用
 
 ## 快速运行
 
@@ -15,10 +15,14 @@ Windows 系统/游戏/隐私优化 CLI，模块化架构，支持：
 # 只读
 python -m haoyue_optimizer.main doctor
 python -m haoyue_optimizer.main plan --preset safe --out safe-plan.json
+python -m haoyue_optimizer.main plan --preset aggressive --profile no_printer --out no-printer-plan.json
 
 # 应用计划需要管理员 PowerShell
 python -m haoyue_optimizer.main apply --plan safe-plan.json --yes
 python -m haoyue_optimizer.main rollback latest
+
+# 仅修复当前处于 Disabled 的 Store-safe 受保护服务；同样生成备份
+python -m haoyue_optimizer.main repair-store-safe
 ```
 
 ## 打包
@@ -48,4 +52,4 @@ legacy/                        # 旧版单文件与旧 spec 备份
 ## 注意
 
 - 真实管理员 apply/rollback 仍需按最小 safe plan 单独验证。
-- `experimental` 默认不可直接应用。
+- 普通 safe/aggressive 不包含显式场景项；交互式“自定义选择”会展示这些项，但仍需逐项选择。

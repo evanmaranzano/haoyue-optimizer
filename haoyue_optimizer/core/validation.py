@@ -12,7 +12,7 @@ ALLOWED_ACTION_TYPES = {
     "subprocess",
 }
 
-ALLOWED_STATUSES = {"passed", "failed", "skipped", "unsupported", "pending_reboot", "partial"}
+ALLOWED_STATUSES = {"passed", "failed", "skipped", "unsupported", "pending_reboot", "partial", "blocked"}
 
 
 class PlanValidationError(ValueError):

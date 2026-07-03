@@ -62,26 +62,26 @@ STORE_SAFE_DEFAULT_START_TYPES: dict[str, str] = {
     "UsoSvc": "manual",
     "WaaSMedicSvc": "manual",
     "BITS": "manual",
-    "DoSvc": "automatic",
-    "CryptSvc": "automatic",
+    "DoSvc": "auto",
+    "CryptSvc": "auto",
     "TrustedInstaller": "manual",
     "StateRepository": "manual",
-    "SystemEventsBroker": "automatic",
+    "SystemEventsBroker": "auto",
     "TimeBrokerSvc": "manual",
-    "BrokerInfrastructure": "automatic",
+    "BrokerInfrastructure": "auto",
     "TokenBroker": "manual",
     "NcbService": "manual",
-    "WpnService": "automatic",
+    "WpnService": "auto",
     "WpnUserService": "manual",
-    "UserManager": "automatic",
-    "ProfSvc": "automatic",
-    "SENS": "automatic",
-    "EventSystem": "automatic",
-    "StorSvc": "automatic",
+    "UserManager": "auto",
+    "ProfSvc": "auto",
+    "SENS": "auto",
+    "EventSystem": "auto",
+    "StorSvc": "auto",
     "AppReadiness": "manual",
     "PushToInstall": "manual",
-    "wscsvc": "automatic",
-    "EventLog": "automatic",
+    "wscsvc": "auto",
+    "EventLog": "auto",
 }
 
 # Services that may legitimately not exist on the current machine.
@@ -126,13 +126,6 @@ OPTIONAL_SERVICES_MAY_NOT_EXIST: set[str] = {
     "RasMan",
     "PrintNotify",
 }
-
-# IFEO targets that must never be deprioritized.
-BLOCKED_IFEO_TARGETS: set[str] = {
-    "svchost.exe",
-    "TrustedInstaller.exe",
-}
-
 
 # ── Hardware detection ─────────────────────────────────────────
 
@@ -194,14 +187,20 @@ def is_amd_cpu() -> bool:
 
 
 def is_laptop() -> bool:
-    """True when the system has a battery (i.e. is a laptop/tablet, not a desktop)."""
+    """True for Windows systems classified as Mobile or Slate."""
     try:
         result = subprocess.run(
             ["powershell", "-Command",
-             "$c=Get-CimInstance Win32_ComputerSystem; if($c.PCSystemType -eq 2){exit 0}else{exit 1}"],
+             "$c=Get-CimInstance Win32_ComputerSystem; "
+             "Write-Output \"$($c.PCSystemType) $($c.PCSystemTypeEx)\""],
             capture_output=True, text=True, encoding="utf-8", errors="ignore",
         )
-        return result.returncode == 0
+        values = [int(value) for value in result.stdout.split()[:2]]
+        if not values:
+            return False
+        system_type = values[0]
+        system_type_ex = values[1] if len(values) > 1 else 0
+        return system_type == 2 or system_type_ex in {2, 8}
     except Exception:
         return False
 
@@ -219,15 +218,6 @@ def _has_intel_hetero_policy() -> bool:
         return "0x" in result.stdout.lower()
     except Exception:
         return False
-
-
-# ── Registry value helpers ─────────────────────────────────────
-
-
-def ntfs_last_access_is_disabled(value: int) -> bool:
-    """Return True when the NtfsDisableLastAccessUpdate value means 'disabled',
-    regardless of the exact encoding (0x80000002 or 0x80000003)."""
-    return value in {0x80000002, 0x80000003}
 
 
 def is_service_disabled(start_type: str | int | None) -> bool:

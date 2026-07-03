@@ -39,13 +39,14 @@ class BackupReportTests(unittest.TestCase):
                     {"verify": {"status": "unsupported"}},
                     {"verify": {"status": "pending_reboot"}},
                     {"verify": {"status": "partial"}},
+                    {"verify": {"status": "blocked"}},
                 ]}
             ]
         }
         with TemporaryDirectory() as tmp:
             path = export_report({"preset": "safe", "items": []}, backup, report_dir=Path(tmp))
             payload = json.loads(path.read_text(encoding="utf-8"))
-        for status in ("passed", "failed", "skipped", "unsupported", "pending_reboot", "partial"):
+        for status in ("passed", "failed", "skipped", "unsupported", "pending_reboot", "partial", "blocked"):
             self.assertEqual(payload["summary"][status], 1)
 
     def test_unknown_status_counts_as_failed(self):

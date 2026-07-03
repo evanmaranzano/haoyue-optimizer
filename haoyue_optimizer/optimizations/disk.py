@@ -107,7 +107,14 @@ def get_optimizations() -> list[Optimization]:
             side_effects=["文件最后访问时间不再更新，可能影响某些备份和归档工具"],
             legacy_ids=[],
             actions=[
-                RegistrySetAction("HKLM", r"SYSTEM\CurrentControlSet\Control\FileSystem", "NtfsDisableLastAccessUpdate", 0x80000003, "dword"),
+                RegistrySetAction(
+                    "HKLM",
+                    r"SYSTEM\CurrentControlSet\Control\FileSystem",
+                    "NtfsDisableLastAccessUpdate",
+                    0x80000003,
+                    "dword",
+                    equivalent_values=(0x80000002, 0x80000003),
+                ),
             ],
         ),
     ]

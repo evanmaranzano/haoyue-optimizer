@@ -28,7 +28,15 @@ def export_report(plan: dict[str, Any], backup: dict[str, Any], report_dir: Path
 
 
 def _summarize(backup: dict[str, Any]) -> dict[str, int]:
-    result = {"passed": 0, "failed": 0, "partial": 0, "pending_reboot": 0, "unsupported": 0, "skipped": 0}
+    result = {
+        "passed": 0,
+        "failed": 0,
+        "partial": 0,
+        "pending_reboot": 0,
+        "unsupported": 0,
+        "skipped": 0,
+        "blocked": 0,
+    }
     for item in backup.get("items", []):
         for action in item.get("actions", []):
             status = action.get("verify", {}).get("status", "failed")

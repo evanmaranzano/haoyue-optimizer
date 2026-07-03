@@ -1,11 +1,26 @@
 from __future__ import annotations
 
 import unittest
+from unittest.mock import patch
 
+from haoyue_optimizer.core.planner import EXPLICIT_PROFILES
+from haoyue_optimizer.ui import cli
 from haoyue_optimizer.ui.selection import parse_selection
 
 
 class UiSelectionTests(unittest.TestCase):
+    def test_custom_selection_exposes_explicit_profile_items(self):
+        with (
+            patch.object(cli, "clear_screen"),
+            patch.object(cli, "banner", return_value=""),
+            patch.object(cli, "ask_preset", return_value="aggressive"),
+            patch.object(cli, "build_plan", return_value={"items": []}) as build,
+            patch("builtins.input", return_value=""),
+        ):
+            cli.custom_select()
+
+        build.assert_called_once_with("aggressive", enabled_profiles=EXPLICIT_PROFILES)
+
     def test_parse_comma_numbers(self):
         self.assertEqual(parse_selection("1,3,5", total=6), [0, 2, 4])
 

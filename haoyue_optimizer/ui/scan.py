@@ -20,8 +20,13 @@ def classify_action(action: dict[str, Any]) -> str:
 def _matches(current: dict[str, Any], desired: dict[str, Any]) -> bool:
     if "exists" in desired and current.get("exists") != desired.get("exists"):
         return False
-    if "value" in desired and current.get("value") != desired.get("value"):
-        return False
+    if "value" in desired:
+        equivalent_values = desired.get("equivalent_values")
+        if equivalent_values:
+            if current.get("value") not in equivalent_values:
+                return False
+        elif current.get("value") != desired.get("value"):
+            return False
     if "ac" in desired and current.get("ac") != desired.get("ac"):
         return False
     if "dc" in desired and current.get("dc") != desired.get("dc"):

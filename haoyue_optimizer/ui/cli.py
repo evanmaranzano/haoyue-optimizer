@@ -9,7 +9,7 @@ from haoyue_optimizer import PRESETS, VERSION
 from haoyue_optimizer.core.admin import is_admin
 from haoyue_optimizer.core.backup import backup_root, latest_backup, read_backup
 from haoyue_optimizer.core.executor import apply_plan, rollback_backup
-from haoyue_optimizer.core.planner import build_plan
+from haoyue_optimizer.core.planner import EXPLICIT_PROFILES, build_plan
 from haoyue_optimizer.core.report import export_report
 from haoyue_optimizer.core.validation import PlanValidationError, validate_plan_for_apply
 from haoyue_optimizer.ui.format import BOLD, CYAN, DIM, GREEN, RED, RESET, YELLOW, banner, clear_screen, pause, risk_label, section
@@ -128,7 +128,7 @@ def custom_select() -> None:
     preset = ask_preset()
     if not preset:
         return
-    plan = build_plan(preset)
+    plan = build_plan(preset, enabled_profiles=EXPLICIT_PROFILES)
     print(section(f"自定义选择: {preset}"))
     print_items(plan["items"])
     raw = input(f"\n  输入编号（如 1,3,5），{GREEN}all{RESET} 全选，{GREEN}safe{RESET} 只选 green: ").strip()

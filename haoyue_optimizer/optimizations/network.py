@@ -15,12 +15,12 @@ def get_optimizations() -> list[Optimization]:
             preset="aggressive",
             risk="red",
             evidence="low",
-            benefit=["移除系统网络节流限制，游戏低延迟优先 (SystemResponsiveness=1)"],
+            benefit=["移除系统网络节流限制，游戏低延迟优先 (SystemResponsiveness=10)"],
             side_effects=["改变系统网络节流策略，可能影响非游戏网络行为。如需通用多媒体优化可手动设为 10"],
             legacy_ids=["net_throttle"],
             actions=[
                 RegistrySetAction("HKLM", r"SOFTWARE\Microsoft\Windows\CurrentVersion\Multimedia\SystemProfile", "NetworkThrottlingIndex", 0xFFFFFFFF, "dword"),
-                RegistrySetAction("HKLM", r"SOFTWARE\Microsoft\Windows\CurrentVersion\Multimedia\SystemProfile", "SystemResponsiveness", 1, "dword"),
+                RegistrySetAction("HKLM", r"SOFTWARE\Microsoft\Windows\CurrentVersion\Multimedia\SystemProfile", "SystemResponsiveness", 10, "dword"),
             ],
         ),
         Optimization(

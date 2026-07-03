@@ -9,10 +9,12 @@ from haoyue_optimizer import PRESETS, VERSION
 from haoyue_optimizer.core.admin import is_admin
 from haoyue_optimizer.core.backup import latest_backup, read_backup
 from haoyue_optimizer.core.executor import apply_plan, rollback_backup
-from haoyue_optimizer.core.planner import build_plan
+from haoyue_optimizer.core.planner import (
+    EXPLICIT_PROFILES,
+    build_plan,
+    build_store_safe_repair_plan,
+)
 from haoyue_optimizer.core.report import export_report
-from haoyue_optimizer.core.service import repair_store_safe_services
-from haoyue_optimizer.core.compat import STORE_SAFE_PROTECTED_SERVICES
 from haoyue_optimizer.core.validation import PlanValidationError, validate_plan_for_apply
 
 GREEN = "\033[92m"
@@ -34,12 +36,14 @@ def main(argv: list[str] | None = None) -> int:
 
     scan_parser = sub.add_parser("scan", help="扫描指定预设当前状态")
     scan_parser.add_argument("--preset", default="safe", choices=PRESETS.keys())
+    scan_parser.add_argument("--profile", action="append", choices=sorted(EXPLICIT_PROFILES), default=[])
 
     sub.add_parser("doctor", help="只读体检全部预设")
     sub.add_parser("presets", help="查看预设说明")
 
     plan_parser = sub.add_parser("plan", help="生成 JSON 变更计划")
     plan_parser.add_argument("--preset", default="safe", choices=PRESETS.keys())
+    plan_parser.add_argument("--profile", action="append", choices=sorted(EXPLICIT_PROFILES), default=[])
     plan_parser.add_argument("--out")
 
     apply_parser = sub.add_parser("apply", help="应用 JSON 变更计划")
@@ -60,7 +64,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     if args.command == "scan":
-        plan = build_plan(args.preset)
+        plan = build_plan(args.preset, enabled_profiles=set(args.profile))
         print(_format_scan(plan))
         return 0
 
@@ -73,7 +77,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "plan":
-        plan = build_plan(args.preset)
+        plan = build_plan(args.preset, enabled_profiles=set(args.profile))
         text = json.dumps(plan, ensure_ascii=False, indent=2)
         if args.out:
             Path(args.out).write_text(text, encoding="utf-8")
@@ -105,6 +109,9 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "rollback":
+        if not is_admin():
+            print("rollback 需要管理员权限，请用管理员 PowerShell 重新运行。", file=sys.stderr)
+            return 3
         path = latest_backup() if args.target == "latest" else Path(args.target)
         if path is None:
             print("未找到备份", file=sys.stderr)
@@ -124,27 +131,37 @@ def main(argv: list[str] | None = None) -> int:
         if not is_admin():
             print("repair-store-safe 需要管理员权限，请用管理员 PowerShell 重新运行。", file=sys.stderr)
             return 3
+        plan, actions = build_store_safe_repair_plan()
+        try:
+            validate_plan_for_apply(plan)
+        except PlanValidationError as exc:
+            print(f"修复计划校验失败: {exc}", file=sys.stderr)
+            return 2
+        if not plan["items"]:
+            print(f"  {GREEN}无需修复，所有受保护服务状态正常{RESET}")
+            return 0
         if not args.yes:
-            print(f"  即将检查 {len(STORE_SAFE_PROTECTED_SERVICES)} 个受保护服务")
+            print(f"  即将修复 {len(plan['items'])} 个被禁用的受保护服务")
             print("  修复规则: 仅将 Disabled → 推荐启动类型，不动其他状态\n")
             confirm = input(f"  输入 {RED}REPAIR{RESET} 确认: ").strip()
             if confirm != "REPAIR":
                 print(f"  {YELLOW}已取消{RESET}", file=sys.stderr)
                 return 4
-        repairs = repair_store_safe_services()
-        fixed = [r for r in repairs if r["status"] == "repaired"]
-        failed = [r for r in repairs if r["status"] == "failed"]
+        backup = apply_plan(plan, additional_actions=actions)
+        fixed = [item for item in backup["items"] if item["status"] == "passed"]
+        failed = [item for item in backup["items"] if item["status"] in ("failed", "partial")]
         if fixed:
             print(f"\n  {GREEN}已修复 {len(fixed)} 个服务:{RESET}")
-            for r in fixed:
-                print(f"    {r['service']}: Disabled → {r['after']}")
+            for item in fixed:
+                action = item["actions"][0]
+                print(f"    {action['target']}: Disabled → {action['after']['start_type']}")
         if failed:
             print(f"\n  {RED}修复失败 {len(failed)} 个:{RESET}")
-            for r in failed:
-                print(f"    {r['service']}: {r.get('detail', 'unknown error')}")
-        if not fixed and not failed:
-            print(f"  {GREEN}无需修复，所有受保护服务状态正常{RESET}")
-        return 0
+            for item in failed:
+                action = item["actions"][0]
+                print(f"    {action['target']}: {action['verify'].get('detail', 'unknown error')}")
+        print(f"\n  备份: {backup['backup_path']}")
+        return 5 if failed else 0
 
     return 1
 

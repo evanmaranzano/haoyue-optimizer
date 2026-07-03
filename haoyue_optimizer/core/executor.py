@@ -8,7 +8,11 @@ from haoyue_optimizer.core.backup import write_backup
 from haoyue_optimizer.core.power import WindowsPowerBackend
 from haoyue_optimizer.core.registry import WindowsRegistryBackend
 from haoyue_optimizer.core.scheduled_task import WindowsScheduledTaskBackend
-from haoyue_optimizer.core.service import WindowsServiceBackend, ServiceNotModifiable
+from haoyue_optimizer.core.service import (
+    ServiceNotModifiable,
+    ServiceStartTypeAction,
+    WindowsServiceBackend,
+)
 from haoyue_optimizer.optimizations.catalog import get_optimizations
 
 
@@ -18,7 +22,10 @@ def apply_plan(
     service_backend=None,
     task_backend=None,
     power_backend=None,
+    subprocess_backend=None,
+    additional_actions: dict[str, Any] | None = None,
     write_file: bool = True,
+    backup_dir=None,
     on_progress=None,
 ) -> dict[str, Any]:
     registry_backend = registry_backend or WindowsRegistryBackend()
@@ -26,6 +33,10 @@ def apply_plan(
     task_backend = task_backend or WindowsScheduledTaskBackend()
     power_backend = power_backend or WindowsPowerBackend()
     actions_by_id = _catalog_actions()
+    for action_id, action in (additional_actions or {}).items():
+        if action_id in actions_by_id:
+            raise ValueError(f"additional action conflicts with catalog: {action_id}")
+        actions_by_id[action_id] = action
     backup = {
         "version": "2.0.0",
         "tool_version": VERSION,
@@ -40,15 +51,24 @@ def apply_plan(
         for action_plan in item.get("actions", []):
             try:
                 action = actions_by_id[action_plan["action_id"]]
-                backend = _backend_for(action.action_type, registry_backend, service_backend, task_backend, power_backend)
+                backend = _backend_for(
+                    action.action_type,
+                    registry_backend,
+                    service_backend,
+                    task_backend,
+                    power_backend,
+                    subprocess_backend,
+                )
                 action_backup = action.apply(backend)
-                action_backup["verify"] = action.verify(backend)
+                if "verify" not in action_backup:
+                    action_backup["verify"] = action.verify(backend)
             except ServiceNotModifiable as exc:
                 action_backup = {
                     "action_id": action_plan.get("action_id", "unknown"),
+                    "action_type": "service_start_type",
                     "target": action_plan.get("target", "unknown"),
                     "before": action_plan.get("current"),
-                    "verify": {"status": "skipped", "detail": str(exc)},
+                    "verify": {"status": "failed", "detail": str(exc)},
                 }
             except Exception as exc:
                 action_backup = {
@@ -65,12 +85,19 @@ def apply_plan(
             on_progress(item["title"], backup_item["status"], item_statuses)
 
     if write_file:
-        path = write_backup(backup)
+        path = write_backup(backup, backup_dir=backup_dir)
         backup["backup_path"] = str(path)
     return backup
 
 
-def rollback_backup(backup: dict[str, Any], registry_backend=None, service_backend=None, task_backend=None, power_backend=None) -> None:
+def rollback_backup(
+    backup: dict[str, Any],
+    registry_backend=None,
+    service_backend=None,
+    task_backend=None,
+    power_backend=None,
+    subprocess_backend=None,
+) -> None:
     registry_backend = registry_backend or WindowsRegistryBackend()
     service_backend = service_backend or WindowsServiceBackend()
     task_backend = task_backend or WindowsScheduledTaskBackend()
@@ -79,12 +106,27 @@ def rollback_backup(backup: dict[str, Any], registry_backend=None, service_backe
 
     for item in reversed(backup.get("items", [])):
         for action_backup in reversed(item.get("actions", [])):
+            if action_backup.get("verify", {}).get("status") in {"blocked", "skipped", "unsupported"}:
+                continue
             action = actions_by_id.get(action_backup.get("action_id"))
             if action is None:
                 action = _catalog_actions_by_target().get(action_backup["target"])
+            if action is None and action_backup.get("action_type") == "service_start_type":
+                before = action_backup.get("before") or {}
+                action = ServiceStartTypeAction(
+                    action_backup["target"],
+                    before.get("start_type", "manual"),
+                )
             if action is None:
                 continue
-            backend = _backend_for(action.action_type, registry_backend, service_backend, task_backend, power_backend)
+            backend = _backend_for(
+                action.action_type,
+                registry_backend,
+                service_backend,
+                task_backend,
+                power_backend,
+                subprocess_backend,
+            )
             action.rollback(backend, action_backup["before"])
 
 
@@ -104,7 +146,14 @@ def _catalog_actions_by_target() -> dict[str, Any]:
     return result
 
 
-def _backend_for(action_type: str, registry_backend, service_backend, task_backend, power_backend):
+def _backend_for(
+    action_type: str,
+    registry_backend,
+    service_backend,
+    task_backend,
+    power_backend,
+    subprocess_backend,
+):
     if action_type == "registry_set":
         return registry_backend
     if action_type == "service_start_type":
@@ -118,7 +167,7 @@ def _backend_for(action_type: str, registry_backend, service_backend, task_backe
     if action_type == "file_cleanup":
         return None
     if action_type == "subprocess":
-        return None
+        return subprocess_backend
     raise ValueError(f"unsupported action type: {action_type}")
 
 

@@ -43,8 +43,10 @@ class FileCleanupAction:
             p = Path(d)
             if not p.exists():
                 continue
-            for f in p.rglob("*"):
-                if f.is_file():
+            try:
+                for f in p.rglob("*"):
+                    if not f.is_file():
+                        continue
                     try:
                         age = now - f.stat().st_mtime
                         if age >= self.max_age_seconds:
@@ -52,6 +54,8 @@ class FileCleanupAction:
                             total_bytes += f.stat().st_size
                     except OSError:
                         pass
+            except OSError:
+                continue
         return {
             "temp_dirs": self.temp_dirs,
             "old_files": total_files,
@@ -72,24 +76,27 @@ class FileCleanupAction:
             p = Path(d)
             if not p.exists():
                 continue
-            for f in p.rglob("*"):
-                if not f.is_file():
-                    continue
-                try:
-                    age = now - f.stat().st_mtime
-                except OSError:
-                    skipped_locked += 1
-                    continue
-                if age < self.max_age_seconds:
-                    skipped_recent += 1
-                    continue
-                try:
-                    size = f.stat().st_size
-                    f.unlink()
-                    deleted_count += 1
-                    deleted_bytes += size
-                except (PermissionError, OSError):
-                    skipped_locked += 1
+            try:
+                for f in p.rglob("*"):
+                    if not f.is_file():
+                        continue
+                    try:
+                        age = now - f.stat().st_mtime
+                    except OSError:
+                        skipped_locked += 1
+                        continue
+                    if age < self.max_age_seconds:
+                        skipped_recent += 1
+                        continue
+                    try:
+                        size = f.stat().st_size
+                        f.unlink()
+                        deleted_count += 1
+                        deleted_bytes += size
+                    except (PermissionError, OSError):
+                        skipped_locked += 1
+            except OSError:
+                skipped_locked += 1
         return {
             "action_id": self.action_id,
             "type": self.action_type,

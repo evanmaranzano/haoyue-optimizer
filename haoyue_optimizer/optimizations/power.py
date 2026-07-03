@@ -133,6 +133,7 @@ def get_optimizations() -> list[Optimization]:
             ],
             side_effects=["CPU Boost 提升后发热和功耗增加"],
             legacy_ids=["laptop_ac"],
+            applicability=["laptop_only"],
             requires_admin=True,
             actions=[
                 PowerCfgSetActiveAction(_action_id="power:laptop_ac:set_balanced"),
@@ -158,7 +159,7 @@ def get_optimizations() -> list[Optimization]:
             ],
             side_effects=["仅 Intel 混合架构 CPU 有效，AMD 平台自动跳过"],
             legacy_ids=[],
-            applicability=["intel_hybrid_only"],
+            applicability=["laptop_only", "intel_hybrid_only"],
             requires_admin=True,
             actions=[
                 PowerCfgSetActiveAction(_action_id="power:intel_hybrid:set_balanced"),

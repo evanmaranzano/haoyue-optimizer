@@ -68,6 +68,7 @@ class RegistrySetAction:
     value: Any
     value_type: str = "dword"
     qualifier: str = ""
+    equivalent_values: tuple[Any, ...] = ()
 
     @property
     def action_id(self) -> str:
@@ -89,11 +90,22 @@ class RegistrySetAction:
         return {"exists": True, **current}
 
     def desired(self) -> dict[str, Any]:
-        return {"exists": True, "value": self.value, "value_type": self.value_type}
+        desired = {"exists": True, "value": self.value, "value_type": self.value_type}
+        if self.equivalent_values:
+            desired["equivalent_values"] = list(self.equivalent_values)
+        return desired
+
+    def _value_matches(self, current: dict[str, Any]) -> bool:
+        if not current.get("exists"):
+            return False
+        if self.equivalent_values:
+            return current.get("value") in self.equivalent_values
+        return current.get("value") == self.value
 
     def apply(self, backend) -> dict[str, Any]:
         before = self.current(backend)
-        backend.write(self.root, self.path, self.name, self.value, self.value_type)
+        if not self._value_matches(before):
+            backend.write(self.root, self.path, self.name, self.value, self.value_type)
         after = self.current(backend)
         return {
             "action_id": self.action_id,
@@ -105,7 +117,7 @@ class RegistrySetAction:
 
     def verify(self, backend) -> dict[str, Any]:
         current = self.current(backend)
-        passed = current.get("exists") and current.get("value") == self.value
+        passed = self._value_matches(current)
         return {"status": "passed" if passed else "failed", "current": current, "expected": self.desired()}
 
     def rollback(self, backend, before: dict[str, Any]) -> None:
