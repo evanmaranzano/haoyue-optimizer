@@ -18,3 +18,7 @@ safe-plan*.json
 gaming-plan*.json
 privacy-plan*.json
 experimental-plan*.json
+
+# 本机配置（不进仓库）
+CLAUDE.local.md
+.claude/settings.local.json
