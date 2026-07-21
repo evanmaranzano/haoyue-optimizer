@@ -1,0 +1,7 @@
+# CLAUDE.local.example.md — 本机构建环境模板
+
+复制为 `CLAUDE.local.md` 并填写本机实际值：
+
+- 构建环境：`<uv venv 路径>`（独立打包环境；Anaconda 的 pathlib backport 与 PyInstaller 冲突，勿直接在 base 环境装 PyInstaller）
+- 本机打包命令：`<venv>\Scripts\pyinstaller.exe 皓月定制优化工具-v3.spec --distpath dist --workpath build`
+- 输出：`dist/皓月定制优化工具-v3.exe`
